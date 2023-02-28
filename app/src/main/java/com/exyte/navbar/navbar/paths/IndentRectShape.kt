@@ -8,31 +8,87 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import com.exyte.navbar.navbar.ballSize
+import com.exyte.navbar.navbar.toPxf
 
-class IndentRectShape : Shape {
+data class IndentShapeData(
+    val xIndent: Float,
+    val height: Float,
+    val width: Float,
+    val cornerRadius: Float,
+    val ballSize: Float,
+)
+
+class IndentRectShape(
+    private val indentShapeData: IndentShapeData,
+) : Shape {
     override fun createOutline(
         size: Size,
         layoutDirection: LayoutDirection,
         density: Density
     ): Outline =
         Outline.Generic(
-            Path().addRoundRectWithSpecialStartPath(size, 0f, 200f)
+            Path().addRoundRectWithSpecialStartPath(size, indentShapeData)
         )
 
+    fun copy(
+        cornerRadius: Float = indentShapeData.cornerRadius,
+        xIndent: Float = indentShapeData.xIndent,
+        yIndent: Float = indentShapeData.height,
+        ballSize: Float = indentShapeData.ballSize,
+    ) = IndentRectShape(
+        indentShapeData.copy(
+            cornerRadius = cornerRadius,
+            xIndent = xIndent,
+            height = yIndent,
+            ballSize = ballSize
+        )
+    )
 }
 
-fun androidx.compose.ui.graphics.Path.addRoundRectWithSpecialStartPath(
+fun Path.addRoundRectWithSpecialStartPath(
     size: Size,
-    heightAnimation: Float,
-    cornerShape: Float,
-): androidx.compose.ui.graphics.Path {
+    indentShapeData: IndentShapeData,
+): Path {
     val width = size.width
     val height = size.height
+    val cornerShape = if (size.height > indentShapeData.cornerRadius) {
+        indentShapeData.cornerRadius
+    } else {
+        size.height
+    }
 
     return apply {
 
         moveTo(cornerShape, 0f)
-//        addPath()
+
+//        addRect(
+//            Rect(
+//                offset = Offset(
+//                    indentShapeData.xIndent - indentShapeData.width / 2 - ballSize.value - 100f, 0f
+//                ),
+//                size = Size(5f, 5f)
+//            )
+//        )
+
+        addPath(
+            IndentPath(
+                Rect(
+                    Offset(
+                        x = indentShapeData.xIndent - indentShapeData.width/2,
+                        y = 0f
+                    ),
+                    Size(indentShapeData.width, indentShapeData.height)
+                )
+            ).createPath()
+        )
+
+//        addRect(
+//            Rect(
+//                offset = Offset(indentShapeData.xIndent, 0f),
+//                size = Size(1f, 70f)
+//            )
+//        )
 
         lineTo(width - cornerShape, 0f)
 

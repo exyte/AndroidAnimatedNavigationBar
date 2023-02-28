@@ -1,11 +1,10 @@
 package com.exyte.navbar.navbar
 
 import android.graphics.Path
-import android.graphics.Point
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -13,177 +12,199 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.MeasurePolicy
-import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.*
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
-import com.exyte.navbar.navbar.paths.IndentRectShape
+import androidx.compose.ui.unit.*
+import com.exyte.navbar.navbar.animation.shape.ShapeInfo
+import com.exyte.navbar.ui.theme.LightGray
 
-@Composable
-fun <T> rememberRef(): MutableState<T?> {
-    // for some reason it always recreated the value with vararg keys,
-    // leaving out the keys as a parameter for remember for now
-    return remember() {
-        object : MutableState<T?> {
-            override var value: T? = null
-
-            override fun component1(): T? = value
-
-            override fun component2(): (T?) -> Unit = { value = it }
-        }
-    }
-}
-
-@Composable
-fun <T> rememberPrevious(
-    current: T,
-    shouldUpdate: (prev: T?, curr: T) -> Boolean = { a: T?, b: T -> a != b },
-): T? {
-    val ref = rememberRef<T>()
-
-    // launched after render, so the current render will have the old value anyway
-    SideEffect {
-        if (shouldUpdate(ref.value, current)) {
-            ref.value = current
-        }
-    }
-
-    return ref.value
-}
+val ballSize = 10.dp
 
 @Composable
 fun AnimatedNavigationBar(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
     barColor: Color = Color.White,
-    selectedColor: Color = Color.Red,
-    unselectedColor: Color = Color.Black,
     ballColor: Color = Color.Red,
     cornerRadius: Dp = 0.dp,
-    verticalPadding: Dp = 10.dp,
-    ballAnimation: Any = Any(),
-    indentAnimation: Any = Any(),
-    buttonsAnimation: Any = Any(),
-    ballTrajectory: BallTrajectory = BallTrajectory.parabolic,
+    ballAnimation: BallAnimation,
+    indentAnimation: IndentAnimation,
     content: @Composable () -> Unit,
 ) {
+    val density = LocalDensity.current
 
-    val isTrue = remember { mutableStateOf(true) }
-
-    Box(
-        modifier = modifier
-            .clickable {
-                isTrue.value = !isTrue.value
-            }
-    ) {
-
-        val a = animateFloatAsState(
-            targetValue = if (isTrue.value) 100f else 0f,
-            animationSpec = tween(1000)
-        )
-
-        CustomNavBarLayout(content, selectedIndex)
-    }
-}
-
-
-val ballSize = 10.dp
-
-@Composable
-fun CustomNavBarLayout(
-    content: @Composable () -> Unit,
-    selectedIndex: Int,
-) {
-
-    var ballPosition = remember {
+    val ballPosition = remember {
         mutableStateOf(IntOffset.Zero)
     }
 
-    val ballPrevPosition = remember { mutableStateOf(0) }
-    val t = remember {
-        Animatable(0f)
-//        TargetBasedAnimation(
-//            animationSpec = tween(200),
-//            typeConverter = Float.VectorConverter,
-//            initialValue = 0f,
-//            targetValue = 1f
+//    val layoutOffset = remember { mutableStateOf(Offset.Zero) }
+
+//    val parabolicNavBarAnimation = remember {
+//        ParabolicNavBarAnimation(
+//            cornerRadius = cornerRadius,
+//            layoutOffset = layoutOffset.value,
+//            animationSpec = indentAnimation.animationSpec
 //        )
-    }
+//    }
 
-    val pointsPositions = remember { mutableListOf<Int>(0, 0, 0, 0, 0, 0) }
-
-//    val prevBallXPosition = rememberPrevious(current = ballPosition.value.x)
-
-//    Log.e("vmref","${ballPosition.value.x} ${prevBallXPosition}")
-
-    LaunchedEffect(ballPosition) {
-        t.snapTo(0f)
-        t.animateTo(1f, tween(1000))
-    }
-
-    val path = remember {
-        android.graphics.Path()
-    }
-
-    val pathMeasurer = remember {
+    val shapeInfo by remember {
         derivedStateOf {
-            val from = Point(0, 0)
-            val to = Point(ballPosition.value.x, 0)
-            path.reset()
-            path.moveTo(from.x.toFloat(), from.y.toFloat())
-            path.quadTo(
-                (from.x + to.x) / 2f, from.y - 100f, to.x.toFloat(), to.y.toFloat()
-            )
-            android.graphics.PathMeasure(path, false)
+            mutableStateOf(ShapeInfo(cornerRadius = cornerRadius, layoutOffset = Offset.Zero))
         }
     }
 
-//    val position = remember {
-//        derivedStateOf {
-//            val length = pathMeasurer.value.length
-//            var pos = floatArrayOf(0f, 0f)
-//            var tan = floatArrayOf(0f, 0f)
-//            pathMeasurer.value.getPosTan(length * t.value, pos, tan)
-//            PointF(pos[0], pos[1])
-//        }
-//    }
+    val indentShape =
+        indentAnimation.animateIndentShapeAsState(
+            shapeInfo = shapeInfo.value,
+            toOffset = ballPosition.value.toOffset()
+        )
 
-//    val position = animateIntOffsetAsState(
-//        targetValue = ballPosition.value,
-//        animationSpec = tween(1000)
-//    )
 
-    val position = animatePathAsState(toPoint = Point(ballPosition.value.x, ballPosition.value.y))
+    val ballAnimInfoState = ballAnimation.animateAsState(toOffset = ballPosition.value.toOffset())
+
 
     val measurePolicy = animatedNavBarMeasurePolicy(
         selectedIndex = selectedIndex,
         ballPosition = ballPosition,
-        ballXPosition = t.value,
-        pointsPositions = pointsPositions,
-        position = position,
     )
 
     Layout(
-        modifier = Modifier
-            .clip(IndentRectShape())
-            .background(Color.Blue),
-        content = {
-            ColorPoint()
-            content()
-        },
+        modifier = modifier
+            .onGloballyPositioned {
+                shapeInfo.value = shapeInfo.value.copy(
+                    layoutOffset = it.positionInParent()
+                )
+            }
+            .graphicsLayer {
+                clip = true
+                shape = indentShape.value
+            }
+            .background(barColor),
+        content = content,
         measurePolicy = measurePolicy
+    )
+
+
+    Log.e("cm;ed", "${ballAnimInfoState.value.scale}")
+
+    ColorPoint(
+        modifier = Modifier
+            .offset {
+//                IntOffset(
+//                    x = (ballAnimInfoState.value.offset.x + shapeInfo.value.layoutOffset.x).toInt(),
+//                    y = (ballAnimInfoState.value.offset.y + shapeInfo.value.layoutOffset.y).toInt()
+//                )
+                IntOffset(
+                    x = (ballAnimInfoState.value.offset.x + shapeInfo.value.layoutOffset.x - ballSize.toPx(
+                        density
+                    ) / 2).toInt(),
+                    y = (ballAnimInfoState.value.offset.y + shapeInfo.value.layoutOffset.y).toInt()
+                )
+            }
+            .graphicsLayer(
+                scaleY = ballAnimInfoState.value.scale,
+                scaleX = ballAnimInfoState.value.scale,
+                transformOrigin = TransformOrigin(pivotFractionX = 0.5f, 0f)
+            ),
+        ballColor = ballColor,
+        sizeDp = 10.dp
     )
 }
 
+
+//@Composable
+//fun animateBallSizeAsState(selectedIndex: Int): State<Dp> {
+//    var prevIndex by remember { mutableStateOf(selectedIndex) }
+//    val density = LocalDensity.current
+//    val fraction = remember { Animatable(ballSize.toPxf(density)) }
+//
+//    LaunchedEffect(selectedIndex) {
+//        if (selectedIndex != prevIndex) {
+//            prevIndex = selectedIndex
+//
+//            fraction.snapTo(fraction.value)
+//            fraction.animateTo(
+//                ballSize.toPxf(density),
+//                repeatable(
+//                    iterations = 2,
+//                    animation = tween(1000),
+//                    repeatMode = RepeatMode.Reverse
+//                ),
+//            )
+//        }
+//    }
+//    return remember {
+//        derivedStateOf {
+//            fraction.value.toDp(density)
+//        }
+//    }
+//}
+
+
 @Composable
-fun animatePathAsState(toPoint: Point): State<Point> {
-    var from = remember { mutableStateOf(Point()) }
-    var to = remember { mutableStateOf(Point()) }
+fun animateScale(toOffset: Offset): State<Float> {
+    var from by remember { mutableStateOf(Offset.Zero) }
+    var to by remember { mutableStateOf(Offset.Zero) }
+    val fraction = remember { Animatable(0f) }
+
+    val density = LocalDensity.current
+
+//            val rect = animateRectAsState(
+//                targetValue = Rect(offset = toOffset, size = Size(
+//                    width = ballSize.toPxf(density),
+//                    height = ballSize.toPxf(density)
+//                )),
+//                animationSpec = animationSpec
+//            )
+
+    LaunchedEffect(toOffset) {
+        if (to != toOffset) {
+            from = to
+            to = toOffset
+
+            fraction.snapTo(0f)
+            fraction.animateTo(2f)
+        }
+    }
+
+    val a = animateFloatAsState(
+        targetValue = 1f,
+        animationSpec = keyframes {
+            durationMillis = 10000
+            0.9f at 0
+            0f at 5000
+            0f at 7000
+            1f at 10000
+        }
+    )
+
+//            val offset = animateOffsetAsState(
+//                targetValue = toOffset,
+//                animationSpec = animationSpec
+//            )
+    return a
+}
+
+//@Composable
+//fun ballRectAsState(
+//    ballAnimation: BallAnimation,
+//    toOffset: IntOffset
+//): State<Rect> {
+//    return ballAnimation.animateAsState(toOffset = toOffset)
+//}
+
+@Composable
+fun animateBallParabolicAsState(toOffset: IntOffset): State<Rect> {
+    var from by remember { mutableStateOf(IntOffset.Zero) }
+    var to by remember { mutableStateOf(IntOffset.Zero) }
     val fraction = remember { Animatable(0f) }
 
     val path = remember { Path() }
@@ -192,20 +213,22 @@ fun animatePathAsState(toPoint: Point): State<Point> {
     val pos = remember { floatArrayOf(0f, 0f) }
     val tan = remember { floatArrayOf(0f, 0f) }
 
-    val point = remember { mutableStateOf(Point()) }
+    var point by remember { mutableStateOf(IntOffset.Zero) }
 
-    LaunchedEffect(toPoint) {
-        if (to != toPoint) {
-            from.value = to.value
-            to.value = toPoint
+    var rect by remember { mutableStateOf(Rect.Zero) }
+
+    LaunchedEffect(toOffset) {
+        if (to != toOffset) {
+            from = to
+            to = toOffset
 
             path.reset()
-            path.moveTo(from.value.x.toFloat(), from.value.y.toFloat())
+            path.moveTo(from.x.toFloat(), from.y.toFloat())
             path.quadTo(
-                (from.value.x + to.value.x) / 2f,
-                from.value.y - 300f,
-                to.value.x.toFloat(),
-                to.value.y.toFloat()
+                (from.x + to.x) / 2f,
+                from.y - 300f,
+                to.x.toFloat(),
+                to.y.toFloat()
             )
 
             pathMeasurer.setPath(path, false)
@@ -216,12 +239,95 @@ fun animatePathAsState(toPoint: Point): State<Point> {
         }
     }
 
+    val ballSizePx = ballSize.toPx()
+
     return remember {
         derivedStateOf {
             pathMeasurer.getPosTan(pathLength.value * fraction.value, pos, tan)
-            point.value.x = pos[0].toInt()
-            point.value.y = pos[1].toInt()
-            point.value
+            point = point.copy(x = pos[0].toInt(), y = pos[1].toInt())
+            rect = rect.copy(
+                point.x.toFloat(),
+                point.y.toFloat(),
+                point.x.toFloat() + ballSizePx,
+                bottom = point.x.toFloat() + ballSizePx
+            )
+            rect
+        }
+    }
+}
+
+@Composable
+fun animateBallStraightAsState(toOffset: IntOffset): State<Rect> {
+    val density = LocalDensity.current
+    val ballRect = remember {
+        mutableStateOf(
+            Rect(
+                offset = Offset.Zero,
+                size = Size(width = ballSize.toPxf(density), height = ballSize.toPxf(density))
+            )
+        )
+    }
+    val offset = animateIntOffsetAsState(
+        targetValue = toOffset,
+        animationSpec = tween(1000)
+    )
+    return remember {
+        derivedStateOf {
+            ballRect.value = ballRect.value.copy(
+                left = offset.value.x.toFloat(),
+                top = offset.value.y.toFloat(),
+                right = offset.value.x.toFloat() + ballRect.value.size.width,
+                bottom = offset.value.y.toFloat() + ballRect.value.size.height
+            )
+            ballRect.value
+        }
+    }
+}
+
+
+@Composable
+fun animateBallTeleportAsState(
+    toOffset: IntOffset,
+): State<androidx.compose.ui.geometry.Rect> {
+    var from by remember { mutableStateOf(IntOffset.Zero) }
+    var to by remember { mutableStateOf(IntOffset.Zero) }
+    val fraction = remember { Animatable(0f) }
+
+    var point by remember { mutableStateOf(IntOffset.Zero) }
+
+    var size by remember { mutableStateOf(ballSize) }
+
+    var offset by remember { mutableStateOf(IntOffset.Zero) }
+
+    LaunchedEffect(toOffset) {
+        if (to != toOffset) {
+            from = to
+            to = toOffset
+
+            Log.e("vnmekr", "${size.value}")
+
+            fraction.snapTo(0f)
+            fraction.animateTo(1f, tween(1000))
+        }
+    }
+
+    val density = LocalDensity.current
+    val ballSizePx = ballSize.toPx()
+
+    return remember {
+        derivedStateOf {
+            size = lerp(0.dp, ballSize, fraction.value)
+            offset = offset.copy(
+                x = lerp(
+                    to.x.toFloat(),
+                    to.x.toFloat() - ballSizePx / 2,
+                    fraction.value
+                ).toInt()
+            )
+            Rect(
+                offset = offset.toOffset(),
+                size = Size(width = size.toPxf(density), height = size.toPxf(density))
+            )
         }
     }
 }
@@ -230,100 +336,75 @@ fun animatePathAsState(toPoint: Point): State<Point> {
 fun animatedNavBarMeasurePolicy(
     selectedIndex: Int,
     ballPosition: MutableState<IntOffset>,
-    ballXPosition: Float,
-    pointsPositions: MutableList<Int>,
-    position: State<Point>,
 ) = remember(
     selectedIndex,
-    ballXPosition,
     ballPosition,
-    pointsPositions,
 ) {
     measureMeasurePolicy(
         selectedIndex = selectedIndex,
         ballPosition = ballPosition,
-        ballXPosition = ballXPosition,
-        pointsPositions = pointsPositions,
-        position = position
     )
 }
 
 internal fun measureMeasurePolicy(
     selectedIndex: Int,
     ballPosition: MutableState<IntOffset>,
-    ballXPosition: Float,
-    pointsPositions: MutableList<Int>,
-    position: State<Point>,
 ) = MeasurePolicy { measurables, constraints ->
+
+    val width = constraints.maxWidth/measurables.size
+
     val placeables = measurables.map { measurable ->
-        measurable.measure(constraints)
+        measurable.measure(constraints.copy(maxWidth = width))
     }
 
     val gap = calculateGap(placeables, constraints.maxWidth)
 
-    layout(constraints.maxWidth, constraints.maxHeight) {
+    val height = placeables.maxOf { it.height }
+
+    layout(constraints.maxWidth, height) {
         var xPosition = gap
-        var yPosition = 0
-        var height = 0
-        placeables.forEachIndexed { index, placeable ->
-            if (placeables[index].height > height) {
-                height = placeables[index].height
-            }
-        }
-        yPosition = constraints.maxHeight - height
 
         placeables.forEachIndexed { index, placeable ->
-            if (index != 0) {
-                placeables[index].placeRelative(xPosition, yPosition)
+            placeables[index].placeRelative(xPosition, 0)
 
-                pointsPositions[index] = calculatePointPosition(
-                    xPosition,
-                    placeables[index].width,
-                    ballSize.roundToPx()
-                )
-
-                if (selectedIndex == index - 1) {
-                    ballPosition.value =
-                        ballPosition.value.copy(
-                            x = calculatePointPosition(
-                                xPosition,
-                                placeables[index].width,
-                                ballSize.roundToPx()
-                            )
+            if (selectedIndex == index) {
+                ballPosition.value =
+                    ballPosition.value.copy(
+                        x = calculatePointPosition(
+                            xPosition,
+                            placeables[index].width,
                         )
-                }
-                xPosition += placeables[index].width + gap
+                    )
             }
+            xPosition += placeables[index].width + gap
         }
-
-        placeables[0].placeRelative(x = position.value.x, y = position.value.y + yPosition)
     }
 }
 
 @Composable
 fun ColorPoint(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    ballColor: Color,
+    sizeDp: Dp
 ) {
     Box(
         modifier = modifier
-            .size(10.dp)
+            .size(sizeDp)
             .clip(shape = CircleShape)
-            .background(Color.Black)
+            .background(ballColor)
     )
 }
 
-fun calculatePointPosition(xButtonPosition: Int, buttonWidth: Int, ballSize: Int): Int {
-    return xButtonPosition + (buttonWidth - ballSize) / 2
+fun calculatePointPosition(xButtonPosition: Int, buttonWidth: Int): Int {
+    return xButtonPosition + (buttonWidth / 2)
 }
 
 fun calculateGap(placeables: List<Placeable>, width: Int): Int {
     var allWidth = 0
     placeables.forEachIndexed { index, placeable ->
-        if (index != 0) {
-            allWidth += placeable.width
-        }
+        allWidth += placeable.width
     }
-    return (width - allWidth) / (placeables.size)
+    return (width - allWidth) / (placeables.size + 1)
 }
 
 
@@ -333,66 +414,67 @@ val backgroundColor = Color(0xFFEEEBE7)
 val accentColor = Color(0xFF625E5C)
 //val backgroundColor = Color.Black
 
-@Composable
-fun AnimatedNavigationItem(
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    icon: Int,
-//    icon: @Composable () -> Unit,
-    description: String,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    label: @Composable (() -> Unit)? = null,
-    alwaysShowLabel: Boolean = true,
-) {
-    val height = animateDpAsState(
-        targetValue = if (isSelected) 73.dp else 65.dp,
-        animationSpec = tween(500)
-    )
-    val tintColor = animateColorAsState(
-        targetValue = if (isSelected) androidx.compose.ui.graphics.Color.White else accentColor,
-        animationSpec = tween(500)
-    )
-    val iconBackgroundColor = animateColorAsState(
-        targetValue = if (isSelected) selectedColor else backgroundColor,
-        animationSpec = tween(500)
-    )
-    Box(
-        modifier = modifier
-            .noRippleClickable {
-                onClick()
-            }
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .align(Alignment.BottomCenter)
-                .background(color = backgroundColor)
-        )
-        Box(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .size(73.dp, height.value)
-                .align(Alignment.BottomCenter)
-                .clip(CircleShape)
-                .background(color = backgroundColor)
-        )
-        Box(
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .size(48.dp)
-                .align(Alignment.BottomCenter)
-                .clip(CircleShape)
-                .background(color = iconBackgroundColor.value)
-        ) {
+//@Composable
+//fun AnimatedNavigationItem(
+//    modifier: Modifier = Modifier,
+//    isSelected: Boolean,
+//    onClick: () -> Unit,
+//    icon: Int,
+//    description: String,
+//    label: @Composable (() -> Unit)? = null,
+//    alwaysShowLabel: Boolean = true,
+//    selectedColor: Color = Color.Black,
+//    unselectedColor: Color = LightGray
+//) {
+//    val tintColor by animateColorAsState(
+//        targetValue = if (isSelected) selectedColor else unselectedColor,
+//        animationSpec = tween(500)
+//    )
+//
+//    Box(
+//        modifier = modifier
+//            .noRippleClickable {
+//                onClick()
+//            }
+//    ) {
+//        Icon(
+//            modifier = Modifier
+//                .size(20.dp)
+//                .align(Alignment.Center),
+//            painter = painterResource(id = icon),
+//            contentDescription = description,
+//            tint = tintColor,
+//        )
+//    }
+//}
 
-            Icon(
-                modifier = Modifier
-                    .align(Alignment.Center),
-                painter = painterResource(id = icon),
-                contentDescription = description,
-                tint = tintColor.value
-            )
-        }
-    }
-}
+@Stable
+fun Int.toDp(density: Density): Dp = with(density) { this@toDp.toDp() }
+
+@Stable
+fun Float.toDp(density: Density): Dp = with(density) { this@toDp.toDp() }
+
+@Stable
+fun TextUnit.toPx(density: Density): Int = with(density) { this@toPx.roundToPx() }
+
+@Stable
+fun Dp.toPx(density: Density): Int = with(density) { this@toPx.roundToPx() }
+
+@Stable
+fun Dp.toPxf(density: Density): Float = with(density) { this@toPxf.toPx() }
+
+@Stable
+@Composable
+fun Dp.toPx(): Int = toPx(LocalDensity.current)
+
+@Stable
+@Composable
+fun Dp.toPxf(): Float = toPxf(LocalDensity.current)
+
+@Stable
+@Composable
+fun Float.toDp() = this.toDp(LocalDensity.current)
+
+@Stable
+@Composable
+fun Int.toDp() = this.toDp(LocalDensity.current)
