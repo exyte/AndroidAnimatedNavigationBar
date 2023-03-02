@@ -1,5 +1,6 @@
 package com.exyte.navbar.navbar.items.colorButtons
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
@@ -24,8 +25,6 @@ import com.exyte.navbar.R
 import com.exyte.navbar.navbar.noRippleClickable
 import com.exyte.navbar.navbar.toPxf
 import com.exyte.navbar.ui.theme.LightGray
-import kotlin.math.PI
-import kotlin.math.sin
 
 data class ButtonBackground(
     val shape: ShapeBackground? = null,
@@ -42,106 +41,22 @@ data class AnimationIconData(
     val degrees: Float,
 )
 
-sealed class AnimationType(
+abstract class AnimationType(
     open val animationSpec: FiniteAnimationSpec<Float> = tween(10000),
     open val background: ButtonBackground,
 ) {
     @Composable
-    abstract fun AnimateIcon(
+    abstract fun AnimatingIcon(
         modifier: Modifier,
         isSelected: Boolean,
+        isFromLeft: Boolean,
+        isToLeft: Boolean,
+        index: Int,
         icon: Int,
         background: ButtonBackground,
         onClick: () -> Unit,
-    ): State<AnimationIconData>
-
-    data class BellAnimation(
-        override val animationSpec: FiniteAnimationSpec<Float>,
-        override val background: ButtonBackground,
-    ) : AnimationType(animationSpec, background) {
-
-        @Composable
-        override fun AnimateIcon(
-            modifier: Modifier,
-            isSelected: Boolean,
-            icon: Int,
-            background: ButtonBackground,
-            onClick: () -> Unit,
-        ): State<AnimationIconData> {
-
-            val fraction = animateFloatAsState(
-                targetValue = if (isSelected) {
-                    1f
-                } else {
-                    0f
-                },
-                animationSpec = animationSpec
-            )
-
-            var animationIconData by remember {
-                mutableStateOf(
-                    AnimationIconData(degrees = 0f)
-                )
-            }
-
-            Box(
-                modifier = modifier
-                    .noRippleClickable {
-                        onClick()
-                    }
-            ) {
-
-                when {
-                    background.shape != null -> {
-                        Box(
-                            modifier = Modifier
-                                .clip(shape = background.shape.shape)
-                                .size(20.dp, 20.dp)
-                                .background(background.shape.color)
-                                .align(Alignment.Center)
-                        )
-                    }
-                    background.icon != null -> {
-                        Image(
-                            modifier = Modifier
-                                .offset(x = background.offset.x, y = background.offset.y)
-                                .align(Alignment.Center),
-                            painter = painterResource(id = background.icon),
-                            contentDescription = null
-                        )
-                    }
-                }
-
-                Icon(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .graphicsLayer(
-                            transformOrigin = TransformOrigin(
-                                pivotFractionX = 0.5f,
-                                pivotFractionY = 0.1f,
-                            ),
-                            rotationZ = degreesRotationInterpolation(fraction.value)
-                        ),
-                    painter = painterResource(id = icon),
-                    contentDescription = null
-                )
-
-            }
-
-
-            return remember {
-                derivedStateOf {
-                    animationIconData =
-                        animationIconData.copy(degrees = degreesRotationInterpolation(fraction.value))
-                    animationIconData
-                }
-            }
-        }
-
-        private fun degreesRotationInterpolation(fraction: Float) =
-            sin(fraction * 2 * PI).toFloat() * 20f
-    }
-
+        state: State<Destination>,
+    )
 
     data class PlusAnimation(
         override val animationSpec: FiniteAnimationSpec<Float>,
@@ -149,13 +64,17 @@ sealed class AnimationType(
     ) : AnimationType(animationSpec, background) {
 
         @Composable
-        override fun AnimateIcon(
+        override fun AnimatingIcon(
             modifier: Modifier,
             isSelected: Boolean,
+            isFromLeft: Boolean,
+            isToLeft: Boolean,
+            index: Int,
             icon: Int,
             background: ButtonBackground,
             onClick: () -> Unit,
-        ): State<AnimationIconData> {
+            state: State<Destination>,
+        ) {
             val fraction = animateFloatAsState(
                 targetValue = if (isSelected) {
                     1f
@@ -164,12 +83,6 @@ sealed class AnimationType(
                 },
                 animationSpec = animationSpec
             )
-
-            var animationIconData by remember {
-                mutableStateOf(
-                    AnimationIconData(degrees = 0f)
-                )
-            }
 
             Box(
                 modifier = modifier
@@ -216,13 +129,6 @@ sealed class AnimationType(
 
             }
 
-            return remember {
-                derivedStateOf {
-//                    animationIconData =
-//                        animationIconData.copy(degrees = degreesRotationInterpolation(fraction.value))
-                    animationIconData
-                }
-            }
         }
 
         private fun plusRotationInterpolation(fraction: Float) = fraction * 90f
@@ -235,13 +141,17 @@ sealed class AnimationType(
     ) : AnimationType(animationSpec, background) {
 
         @Composable
-        override fun AnimateIcon(
+        override fun AnimatingIcon(
             modifier: Modifier,
             isSelected: Boolean,
+            isFromLeft: Boolean,
+            isToLeft: Boolean,
+            index: Int,
             icon: Int,
             background: ButtonBackground,
             onClick: () -> Unit,
-        ): State<AnimationIconData> {
+            state: State<Destination>,
+        ) {
 
             val fraction = animateFloatAsState(
                 targetValue = if (isSelected) {
@@ -310,13 +220,6 @@ sealed class AnimationType(
                 )
 
             }
-
-
-            return remember {
-                derivedStateOf {
-                    animationIconData
-                }
-            }
         }
 
         fun offset(maxHorizontalOffset: Float, fraction: Float): Float {
@@ -337,13 +240,17 @@ sealed class AnimationType(
     ) : AnimationType(animationSpec, background) {
 
         @Composable
-        override fun AnimateIcon(
+        override fun AnimatingIcon(
             modifier: Modifier,
             isSelected: Boolean,
+            isFromLeft: Boolean,
+            isToLeft: Boolean,
+            index: Int,
             icon: Int,
             background: ButtonBackground,
             onClick: () -> Unit,
-        ): State<AnimationIconData> {
+            state: State<Destination>,
+        ) {
 
             val fraction = animateFloatAsState(
                 targetValue = if (isSelected) {
@@ -399,13 +306,6 @@ sealed class AnimationType(
 
 
             }
-
-
-            return remember {
-                derivedStateOf {
-                    animationIconData
-                }
-            }
         }
 
         private fun gearRotateInterpolation(maxDegree: Float, fraction: Float) =
@@ -416,19 +316,31 @@ sealed class AnimationType(
 }
 
 
+enum class Destination {
+    FromToRight,
+    FromToLeft,
+    ToFromRight,
+    ToFromLeft,
+    Nothing,
+}
+
 @Composable
 fun ColorButton(
     modifier: Modifier = Modifier,
     isSelected: Boolean,
+    index: Int,
+    prevSelectedIndex: Int,
     onClick: () -> Unit,
     icon: Int,
     contentDescription: String = "",
-    label: @Composable (() -> Unit)? = null,
+    label: @Composable() (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
     selectedColor: Color = Color.Black,
     unselectedColor: Color = LightGray,
     background: ButtonBackground,
     animationType: AnimationType,
+    prevIndex: Int,
+    selectedIndex: Int,
 ) {
 
     Box(
@@ -438,12 +350,67 @@ fun ColorButton(
             }
     ) {
 
-        animationType.AnimateIcon(
+        val prevIndex = remember {
+            mutableStateOf(0)
+        }
+
+//        val index = remember {
+//            derivedStateOf{
+//                mutableStateOf(index)
+//            }
+//        }
+
+        val state = remember(isSelected, selectedIndex, prevSelectedIndex) {
+            derivedStateOf {
+                mutableStateOf(
+                    if (isSelected) {
+                        if (index == prevSelectedIndex) {
+                            Destination.Nothing
+                        } else
+                            if (index < prevSelectedIndex) {
+                                Destination.ToFromRight
+                            } else {
+                                Destination.ToFromLeft
+                            }
+                    } else {
+                        if (index == selectedIndex) {
+                            Destination.Nothing
+                        } else
+                            if (index < selectedIndex) {
+                                Destination.FromToRight
+                            } else {
+                                Destination.FromToLeft
+                            }
+                    }
+                )
+            }
+        }
+
+
+        val isFromLeft by remember {
+            derivedStateOf {
+                val isFromLeft = mutableStateOf(prevIndex.value < index)
+                prevIndex.value = index
+                isFromLeft
+            }
+        }
+
+        animationType.AnimatingIcon(
             modifier = modifier,
             isSelected = isSelected,
+            isFromLeft = prevSelectedIndex < selectedIndex,
+            isToLeft = selectedIndex < index,
+            state = state.value,
+            index = index,
             icon = icon,
             background = background,
             onClick = onClick
         )
+
+        Log.e(
+            "sommvoilnkfdbv",
+            "index: ${index} selectedIndex:${selectedIndex} isFromLeft:${index < selectedIndex} isSelected:${isSelected}"
+        )
+
     }
 }

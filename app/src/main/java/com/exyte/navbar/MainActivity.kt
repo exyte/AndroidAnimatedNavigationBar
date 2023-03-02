@@ -24,8 +24,10 @@ import com.exyte.navbar.navbar.AnimatedNavigationBar
 import com.exyte.navbar.navbar.BallAnimation
 import com.exyte.navbar.navbar.IndentAnimation
 import com.exyte.navbar.navbar.items.colorButtons.AnimationType
+import com.exyte.navbar.navbar.items.colorButtons.BellAnimation
 import com.exyte.navbar.navbar.items.colorButtons.ButtonBackground
 import com.exyte.navbar.navbar.items.colorButtons.ColorButton
+import com.exyte.navbar.navbar.items.wigglebutton.WiggleButton
 import com.exyte.navbar.ui.theme.ElectricViolet
 import com.exyte.navbar.ui.theme.NavBarTheme
 
@@ -46,6 +48,7 @@ class MainActivity : ComponentActivity() {
                             .background(ElectricViolet)
                     ) {
                         val selectedItem = remember { mutableStateOf(0) }
+                        val prevSelectedIndex = remember { mutableStateOf(0) }
 
                         AnimatedNavigationBar(
                             modifier = Modifier
@@ -55,20 +58,32 @@ class MainActivity : ComponentActivity() {
                             selectedIndex = selectedItem.value,
                             ballColor = Color.White,
                             cornerRadius = 25.dp,
-                            ballAnimation = BallAnimation.Teleport(tween(1000)),
+                            ballAnimation = BallAnimation.Parabolic(tween(1000)),
                             indentAnimation = IndentAnimation.Height(animationSpec = tween(1000))
                         ) {
-                            dropletButtonItems.forEachIndexed { index, it ->
-                                ColorButton(
-                                    modifier = Modifier
-                                        .fillMaxSize(1f),
-                                    isSelected = selectedItem.value == index,
+                            items.forEachIndexed { index, it ->
+                                WiggleButton(
+                                    isSelected = selectedItem.value == index ,
                                     onClick = { selectedItem.value = index },
-                                    icon = it.icon,
-                                    contentDescription = stringResource(id = it.description),
-                                    animationType = it.animationType,
-                                    background = it.animationType.background
+                                    icon = it.icon
                                 )
+//                                ColorButton(
+//                                    modifier = Modifier
+//                                        .fillMaxSize(1f),
+//                                    isSelected = selectedItem.value == index,
+//                                    prevSelectedIndex = prevSelectedIndex.value,
+//                                    index = index,
+//                                    selectedIndex = selectedItem.value,
+//                                    prevIndex = prevSelectedIndex.value,
+//                                    onClick = {
+//                                        prevSelectedIndex.value = selectedItem.value
+//                                        selectedItem.value = index
+//                                    },
+//                                    icon = it.icon,
+//                                    contentDescription = stringResource(id = it.description),
+//                                    animationType = it.animationType,
+//                                    background = it.animationType.background
+//                                )
                             }
                         }
                     }
@@ -111,7 +126,7 @@ val dropletButtonItems = listOf(
         icon = R.drawable.icon_home,
         isSelected = true,
         description = R.string.Home,
-        animationType = AnimationType.BellAnimation(
+        animationType = AnimationType.PlusAnimation(
             animationSpec = spring(
                 dampingRatio = 7f,
                 stiffness = 3000f
@@ -126,7 +141,7 @@ val dropletButtonItems = listOf(
         icon = R.drawable.icon_bell,
         isSelected = false,
         description = R.string.Bell,
-        animationType = AnimationType.BellAnimation(
+        animationType = BellAnimation(
             animationSpec = spring(
                 dampingRatio = 7f,
                 stiffness = 3000f

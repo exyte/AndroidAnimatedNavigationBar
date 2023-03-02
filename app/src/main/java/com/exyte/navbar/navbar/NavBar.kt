@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.*
 import com.exyte.navbar.navbar.animation.shape.ShapeInfo
 import com.exyte.navbar.ui.theme.LightGray
 
-val ballSize = 10.dp
 
+val ballSize = 10.dp
 @Composable
 fun AnimatedNavigationBar(
     modifier: Modifier = Modifier,
@@ -44,16 +44,6 @@ fun AnimatedNavigationBar(
     val ballPosition = remember {
         mutableStateOf(IntOffset.Zero)
     }
-
-//    val layoutOffset = remember { mutableStateOf(Offset.Zero) }
-
-//    val parabolicNavBarAnimation = remember {
-//        ParabolicNavBarAnimation(
-//            cornerRadius = cornerRadius,
-//            layoutOffset = layoutOffset.value,
-//            animationSpec = indentAnimation.animationSpec
-//        )
-//    }
 
     val shapeInfo by remember {
         derivedStateOf {
@@ -98,10 +88,6 @@ fun AnimatedNavigationBar(
     ColorPoint(
         modifier = Modifier
             .offset {
-//                IntOffset(
-//                    x = (ballAnimInfoState.value.offset.x + shapeInfo.value.layoutOffset.x).toInt(),
-//                    y = (ballAnimInfoState.value.offset.y + shapeInfo.value.layoutOffset.y).toInt()
-//                )
                 IntOffset(
                     x = (ballAnimInfoState.value.offset.x + shapeInfo.value.layoutOffset.x - ballSize.toPx(
                         density
@@ -119,36 +105,6 @@ fun AnimatedNavigationBar(
     )
 }
 
-
-//@Composable
-//fun animateBallSizeAsState(selectedIndex: Int): State<Dp> {
-//    var prevIndex by remember { mutableStateOf(selectedIndex) }
-//    val density = LocalDensity.current
-//    val fraction = remember { Animatable(ballSize.toPxf(density)) }
-//
-//    LaunchedEffect(selectedIndex) {
-//        if (selectedIndex != prevIndex) {
-//            prevIndex = selectedIndex
-//
-//            fraction.snapTo(fraction.value)
-//            fraction.animateTo(
-//                ballSize.toPxf(density),
-//                repeatable(
-//                    iterations = 2,
-//                    animation = tween(1000),
-//                    repeatMode = RepeatMode.Reverse
-//                ),
-//            )
-//        }
-//    }
-//    return remember {
-//        derivedStateOf {
-//            fraction.value.toDp(density)
-//        }
-//    }
-//}
-
-
 @Composable
 fun animateScale(toOffset: Offset): State<Float> {
     var from by remember { mutableStateOf(Offset.Zero) }
@@ -156,14 +112,6 @@ fun animateScale(toOffset: Offset): State<Float> {
     val fraction = remember { Animatable(0f) }
 
     val density = LocalDensity.current
-
-//            val rect = animateRectAsState(
-//                targetValue = Rect(offset = toOffset, size = Size(
-//                    width = ballSize.toPxf(density),
-//                    height = ballSize.toPxf(density)
-//                )),
-//                animationSpec = animationSpec
-//            )
 
     LaunchedEffect(toOffset) {
         if (to != toOffset) {
@@ -192,14 +140,6 @@ fun animateScale(toOffset: Offset): State<Float> {
 //            )
     return a
 }
-
-//@Composable
-//fun ballRectAsState(
-//    ballAnimation: BallAnimation,
-//    toOffset: IntOffset
-//): State<Rect> {
-//    return ballAnimation.animateAsState(toOffset = toOffset)
-//}
 
 @Composable
 fun animateBallParabolicAsState(toOffset: IntOffset): State<Rect> {
@@ -406,47 +346,6 @@ fun calculateGap(placeables: List<Placeable>, width: Int): Int {
     }
     return (width - allWidth) / (placeables.size + 1)
 }
-
-
-val selectedColor = Color(0xFFE9A75A)
-
-val backgroundColor = Color(0xFFEEEBE7)
-val accentColor = Color(0xFF625E5C)
-//val backgroundColor = Color.Black
-
-//@Composable
-//fun AnimatedNavigationItem(
-//    modifier: Modifier = Modifier,
-//    isSelected: Boolean,
-//    onClick: () -> Unit,
-//    icon: Int,
-//    description: String,
-//    label: @Composable (() -> Unit)? = null,
-//    alwaysShowLabel: Boolean = true,
-//    selectedColor: Color = Color.Black,
-//    unselectedColor: Color = LightGray
-//) {
-//    val tintColor by animateColorAsState(
-//        targetValue = if (isSelected) selectedColor else unselectedColor,
-//        animationSpec = tween(500)
-//    )
-//
-//    Box(
-//        modifier = modifier
-//            .noRippleClickable {
-//                onClick()
-//            }
-//    ) {
-//        Icon(
-//            modifier = Modifier
-//                .size(20.dp)
-//                .align(Alignment.Center),
-//            painter = painterResource(id = icon),
-//            contentDescription = description,
-//            tint = tintColor,
-//        )
-//    }
-//}
 
 @Stable
 fun Int.toDp(density: Density): Dp = with(density) { this@toDp.toDp() }
