@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import com.exyte.navbar.navbar.ballSize
-import com.exyte.navbar.navbar.toPxf
 
 //class StraightNavBarAnimation(
 //    val cornerRadius: Dp,

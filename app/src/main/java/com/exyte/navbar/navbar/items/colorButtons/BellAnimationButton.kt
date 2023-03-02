@@ -17,9 +17,9 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.exyte.navbar.navbar.lerp
-import com.exyte.navbar.navbar.noRippleClickable
-import com.exyte.navbar.navbar.toDp
+import com.exyte.navbar.navbar.utils.lerp
+import com.exyte.navbar.navbar.utils.noRippleClickable
+import com.exyte.navbar.navbar.utils.toDp
 import kotlin.math.PI
 import kotlin.math.sin
 

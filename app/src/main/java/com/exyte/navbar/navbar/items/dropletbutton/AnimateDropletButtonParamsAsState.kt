@@ -4,7 +4,7 @@ import androidx.annotation.FloatRange
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.*
-import com.exyte.navbar.navbar.lerp
+import com.exyte.navbar.navbar.utils.lerp
 import java.lang.Float.max
 import java.lang.Float.min
 

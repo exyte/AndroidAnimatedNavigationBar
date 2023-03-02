@@ -1,4 +1,4 @@
-package com.exyte.navbar.navbar
+package com.exyte.navbar.navbar.utils
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,6 +15,3 @@ fun Modifier.noRippleClickable(
 ) {
     onClick()
 }
-
-internal fun lerp(start: Float, stop: Float, fraction: Float) =
-    (start * (1 - fraction) + stop * fraction)

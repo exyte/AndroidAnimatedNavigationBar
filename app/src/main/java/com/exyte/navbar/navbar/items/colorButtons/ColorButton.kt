@@ -22,8 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.exyte.navbar.R
-import com.exyte.navbar.navbar.noRippleClickable
-import com.exyte.navbar.navbar.toPxf
+import com.exyte.navbar.navbar.utils.noRippleClickable
+import com.exyte.navbar.navbar.utils.toPxf
 import com.exyte.navbar.ui.theme.LightGray
 
 data class ButtonBackground(

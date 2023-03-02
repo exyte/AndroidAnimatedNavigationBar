@@ -10,7 +10,7 @@
 //import androidx.compose.ui.unit.Dp
 //import androidx.compose.ui.unit.dp
 //import com.exyte.navbar.navbar.ballSize
-//import com.exyte.navbar.navbar.lerp
+//import com.exyte.navbar.navbar.utils.lerp
 //import com.exyte.navbar.navbar.paths.IndentRectShape
 //import com.exyte.navbar.navbar.toPx
 //import com.exyte.navbar.navbar.toPxf

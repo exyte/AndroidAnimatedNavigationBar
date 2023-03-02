@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import com.exyte.navbar.navbar.ballSize
-import com.exyte.navbar.navbar.toPxf
 
 data class IndentShapeData(
     val xIndent: Float,

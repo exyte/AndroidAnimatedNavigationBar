@@ -13,6 +13,9 @@ import androidx.compose.ui.unit.dp
 import com.exyte.navbar.navbar.animation.shape.ShapeInfo
 import com.exyte.navbar.navbar.paths.IndentRectShape
 import com.exyte.navbar.navbar.paths.IndentShapeData
+import com.exyte.navbar.navbar.utils.lerp
+import com.exyte.navbar.navbar.utils.toPx
+import com.exyte.navbar.navbar.utils.toPxf
 
 sealed class IndentAnimation(
     open val animationSpec: FiniteAnimationSpec<Float> = tween(1000),

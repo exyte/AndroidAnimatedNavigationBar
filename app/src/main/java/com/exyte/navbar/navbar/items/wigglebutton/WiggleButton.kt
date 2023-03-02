@@ -21,7 +21,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.exyte.navbar.navbar.noRippleClickable
+import com.exyte.navbar.navbar.utils.noRippleClickable
 import com.exyte.navbar.ui.theme.LightGray
 import kotlin.math.PI
 
