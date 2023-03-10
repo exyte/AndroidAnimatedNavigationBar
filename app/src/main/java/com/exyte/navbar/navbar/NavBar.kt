@@ -1,6 +1,5 @@
 package com.exyte.navbar.navbar
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -8,23 +7,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.*
+import com.exyte.navbar.navbar.animation.balltrajectory.BallAnimInfo
+import com.exyte.navbar.navbar.animation.balltrajectory.BallAnimation
+import com.exyte.navbar.navbar.animation.indendshape.IndentAnimation
 import com.exyte.navbar.navbar.animation.shape.ShapeInfo
 import com.exyte.navbar.navbar.layout.animatedNavBarMeasurePolicy
-import com.exyte.navbar.navbar.utils.toPx
-
-
-val ballSize = 10.dp
+import com.exyte.navbar.navbar.utils.ballTransform
+import com.exyte.navbar.navbar.utils.toPxf
 
 @Composable
 fun AnimatedNavigationBar(
     modifier: Modifier = Modifier,
-    @DrawableRes selectedIndex: Int,
+    selectedIndex: Int,
     barColor: Color = Color.White,
     ballColor: Color = Color.Red,
     cornerRadius: Dp = 0.dp,
@@ -32,33 +32,39 @@ fun AnimatedNavigationBar(
     indentAnimation: IndentAnimation,
     content: @Composable () -> Unit,
 ) {
-    val density = LocalDensity.current
 
-    val ballPosition = remember { mutableStateOf(Offset.Zero) }
-
-    var shapeInfo by remember {
-            mutableStateOf(ShapeInfo(cornerRadius = cornerRadius, layoutOffset = Offset.Zero))
+    var itemPositions by remember { mutableStateOf(listOf<Offset>()) }
+    val measurePolicy = animatedNavBarMeasurePolicy {
+        itemPositions = it.map { xCord ->
+            Offset(xCord, 0f)
+        }
     }
 
-    val indentShape =
-        indentAnimation.animateIndentShapeAsState(
-            shapeInfo = shapeInfo,
-            toOffset = ballPosition.value
-        )
+    val selectedItemOffset by remember(selectedIndex, itemPositions) {
+        derivedStateOf {
+            if (itemPositions.isNotEmpty()) itemPositions[selectedIndex] else Offset.Unspecified
+        }
+    }
 
-    val ballAnimInfoState = ballAnimation.animateAsState(toOffset = ballPosition.value)
+    var shapeInfo by remember {
+        mutableStateOf(ShapeInfo(cornerRadius = cornerRadius, layoutOffset = Offset.Unspecified))
+    }
 
-    val measurePolicy = animatedNavBarMeasurePolicy(
-        selectedIndex = selectedIndex,
-        ballPosition = ballPosition,
+    val density = LocalDensity.current
+    val indentShape = indentAnimation.animateIndentShapeAsState(
+        cornerRadius = cornerRadius.toPxf(density),
+        targetOffset = selectedItemOffset
+    )
+
+    val ballAnimInfoState = ballAnimation.animateAsState(
+        toOffset = selectedItemOffset,
+        layoutShapeInfo = shapeInfo
     )
 
     Layout(
         modifier = modifier
             .onGloballyPositioned {
-                shapeInfo = shapeInfo.copy(
-                    layoutOffset = it.positionInParent()
-                )
+                shapeInfo = shapeInfo.copy(layoutOffset = it.positionInParent())
             }
             .graphicsLayer {
                 clip = true
@@ -69,34 +75,27 @@ fun AnimatedNavigationBar(
         measurePolicy = measurePolicy
     )
 
-    ColorBall(
-        modifier = Modifier
-            .offset {
-                IntOffset(
-                    x = (ballAnimInfoState.value.offset.x + shapeInfo.layoutOffset.x - ballSize.toPx(
-                        density
-                    ) / 2).toInt(),
-                    y = (ballAnimInfoState.value.offset.y + shapeInfo.layoutOffset.y).toInt()
-                )
-            }
-            .graphicsLayer(
-                scaleY = ballAnimInfoState.value.scale,
-                scaleX = ballAnimInfoState.value.scale,
-                transformOrigin = TransformOrigin(pivotFractionX = 0.5f, 0f)
-            ),
-        ballColor = ballColor,
-        sizeDp = 10.dp
-    )
+    if (ballAnimInfoState.value.offset.isSpecified) {
+        ColorBall(
+            ballAnimInfo = ballAnimInfoState.value,
+            ballColor = ballColor,
+            sizeDp = ballSize
+        )
+    }
 }
+
+val ballSize = 10.dp
 
 @Composable
 fun ColorBall(
     modifier: Modifier = Modifier,
     ballColor: Color,
-    sizeDp: Dp
+    ballAnimInfo: BallAnimInfo,
+    sizeDp: Dp,
 ) {
     Box(
         modifier = modifier
+            .ballTransform(ballAnimInfo)
             .size(sizeDp)
             .clip(shape = CircleShape)
             .background(ballColor)

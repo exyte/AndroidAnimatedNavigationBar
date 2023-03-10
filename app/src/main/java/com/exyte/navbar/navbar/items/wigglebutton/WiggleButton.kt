@@ -136,7 +136,7 @@ fun DrawWithBlendMode(
             )
         }
 
-        drawPath(path, color = arcColor, blendMode = BlendMode.SrcAtop)
+//        drawPath(path, color = arcColor, blendMode = BlendMode.SrcAtop)
     }
 }
 

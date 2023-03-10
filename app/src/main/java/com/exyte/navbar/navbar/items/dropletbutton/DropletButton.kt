@@ -1,7 +1,7 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package com.exyte.navbar.navbar.items.dropletbutton
 
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
@@ -22,6 +22,7 @@ import com.exyte.navbar.navbar.items.wigglebutton.rememberVectorPainter
 import com.exyte.navbar.navbar.utils.noRippleClickable
 import com.exyte.navbar.navbar.utils.toPxf
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DropletButton(
     modifier: Modifier = Modifier,
@@ -29,11 +30,9 @@ fun DropletButton(
     onClick: () -> Unit,
     icon: Int,
     contentDescription: String = "",
-    label: @Composable (() -> Unit)? = null,
-    alwaysShowLabel: Boolean = true,
-    selectedColor: Color = Color.Black,
     iconColor: Color = Color.LightGray,
-    dropletColor: Color = Color.Red
+    dropletColor: Color = Color.Red,
+    animationSpec: AnimationSpec<Float> = remember { tween(300) }
 ) {
     var canvasSize by remember {
         mutableStateOf(Size.Zero)
@@ -52,49 +51,20 @@ fun DropletButton(
             }
     ) {
 
-        val dropletButtonParams = animateDropletButtonAsState(isSelected = isSelected)
+        val animSpec = remember { animationSpec }
+        val dropletButtonParams = animateDropletButtonAsState(
+            isSelected = isSelected, animationSpec = animSpec
+        )
 
         val density = LocalDensity.current
 
-//        Image(
-//            modifier = Modifier
-//                .graphicsLayer {
-//                    alpha = 0.99f
-//                }
-//                .align(Alignment.Center),
-//            painter = painterResource(id = icon),
-//            contentDescription = contentDescription,
-//            colorFilter = ColorFilter.tint(iconColor, blendMode = BlendMode.SrcIn)
-//        )
-//
-//        Image(
-//            modifier = Modifier
-//                .offset(x = 20.dp, y = 30.dp),
-//            painter = painterResource(id = icon),
-//            contentDescription = null,
-//            colorFilter = ColorFilter.tint(dropletColor)
-//        )
-
-//        Box(
-//            modifier = Modifier.drawWithContent {
-//                drawCircle(
-//                    color = dropletColor,
-//                    radius = dropletButtonParams.value.radius,
-//                    center = Offset(canvasSize.width / 2, dropletButtonParams.value.verticalOffset),
-//                    blendMode = BlendMode.SrcAtop
-//                )
-//            }
-//        )
-
         val iconOffset by remember {
-            derivedStateOf{
-                mutableStateOf((canvasSize.height - 20.dp.toPxf(density))/2)
+            derivedStateOf {
+                mutableStateOf((canvasSize.height - 20.dp.toPxf(density)) / 2)
             }
         }
-//
         Canvas(
             modifier = Modifier
-//                .size(20.dp,20.dp)
                 .width(20.dp)
                 .fillMaxHeight()
                 .align(Alignment.Center)
@@ -112,7 +82,6 @@ fun DropletButton(
                 with(painter) {
                     draw(
                         size = Size(20.dp.toPxf(density), 20.dp.toPxf(density)),
-//                    Size(canvasSize.width, canvasSize.width),
                         colorFilter = ColorFilter.tint(color = iconColor)
                     )
                 }
@@ -121,42 +90,12 @@ fun DropletButton(
             drawCircle(
                 color = dropletColor,
                 radius = dropletButtonParams.value.radius,
-                center = Offset(canvasSize.width / 2, dropletButtonParams.value.verticalOffset + iconOffset.value),
+                center = Offset(
+                    canvasSize.width / 2,
+                    dropletButtonParams.value.verticalOffset + iconOffset.value - 20f
+                ),
                 blendMode = BlendMode.SrcIn
             )
         }
     }
 }
-
-//fun DrawScope.draw(
-//    size: Size,
-//    alpha: Float = DefaultAlpha,
-//    colorFilter: ColorFilter? = null
-//) {
-//    configureAlpha(alpha)
-//    configureColorFilter(colorFilter)
-//    configureLayoutDirection(layoutDirection)
-//
-//    // b/156512437 to expose saveLayer on DrawScope
-//    inset(
-//        left = 0.0f,
-//        top = 0.0f,
-//        right = this.size.width - size.width,
-//        bottom = this.size.height - size.height
-//    ) {
-//
-//        if (alpha > 0.0f && size.width > 0 && size.height > 0) {
-//            if (useLayer) {
-//                val layerRect = Rect(Offset.Zero, Size(size.width, size.height))
-//                // TODO (b/154550724) njawad replace with RenderNode/Layer API usage
-//                drawIntoCanvas { canvas ->
-//                    canvas.withSaveLayer(layerRect, obtainPaint()) {
-//                        onDraw()
-//                    }
-//                }
-//            } else {
-//                onDraw()
-//            }
-//        }
-//    }
-//}

@@ -1,15 +1,12 @@
 package com.exyte.navbar
 
 import android.os.Bundle
+import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.mutableStateOf
@@ -21,12 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.exyte.navbar.navbar.AnimatedNavigationBar
-import com.exyte.navbar.navbar.BallAnimation
-import com.exyte.navbar.navbar.IndentAnimation
-import com.exyte.navbar.navbar.items.colorButtons.AnimationType
-import com.exyte.navbar.navbar.items.colorButtons.BellAnimation
-import com.exyte.navbar.navbar.items.colorButtons.ButtonBackground
-import com.exyte.navbar.navbar.items.colorButtons.ColorButton
+import com.exyte.navbar.navbar.animation.indendshape.Straight
+import com.exyte.navbar.navbar.items.colorButtons.*
 import com.exyte.navbar.navbar.items.wigglebutton.WiggleButton
 import com.exyte.navbar.ui.theme.ElectricViolet
 import com.exyte.navbar.ui.theme.NavBarTheme
@@ -50,23 +43,50 @@ class MainActivity : ComponentActivity() {
                         val selectedItem = remember { mutableStateOf(0) }
                         val prevSelectedIndex = remember { mutableStateOf(0) }
 
-                        AnimatedNavigationBar(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(horizontal = 8.dp, vertical = 20.dp)
-                                .height(72.dp),
-                            selectedIndex = selectedItem.value,
-                            ballColor = Color.White,
-                            cornerRadius = 25.dp,
-                            ballAnimation = BallAnimation.Parabolic(tween(1000)),
-                            indentAnimation = IndentAnimation.Height(animationSpec = tween(1000))
-                        ) {
-                            items.forEachIndexed { index, it ->
-                                WiggleButton(
-                                    isSelected = selectedItem.value == index ,
-                                    onClick = { selectedItem.value = index },
-                                    icon = it.icon
-                                )
+//                        AnimatedNavigationBar(
+//                            modifier = Modifier
+//                                .align(Alignment.BottomCenter)
+//                                .padding(horizontal = 8.dp, vertical = 20.dp)
+//                                .height(80.dp),
+//                            selectedIndex = selectedItem.value,
+//                            ballColor = Color.White,
+//                            cornerRadius = 30.dp,
+//                            ballAnimation = Parabolic(tween(1000)),
+//                            indentAnimation = Height(
+//                                indentWidth = 60.dp,
+//                                indentHeight = 20.dp,
+//                                animationSpec = tween(1000)
+//                            )
+//                        ) {
+//                            items.forEachIndexed { index, it ->
+//                                DropletButton(
+//                                    modifier = Modifier.fillMaxSize(),
+//                                    isSelected = selectedItem.value == index,
+//                                    onClick = { selectedItem.value = index },
+//                                    icon = it.icon,
+//                                    dropletColor = Purple,
+//                                    animationSpec = tween(1000, easing = LinearEasing)
+//                                )
+//                            }
+//                        }
+
+//                        AnimatedNavigationBar(
+//                            modifier = Modifier
+//                                .align(Alignment.Center)
+//                                .padding(horizontal = 8.dp, vertical = 20.dp)
+//                                .height(72.dp),
+//                            selectedIndex = selectedItem.value,
+//                            ballColor = Color.White,
+//                            cornerRadius = 20.dp,
+//                            ballAnimation = com.exyte.navbar.navbar.animation.balltrajectory.Straight(
+//                                tween(1000)
+//                            ),
+//                            indentAnimation = Straight(
+//                                indentWidth = 50.dp,
+//                                animationSpec = tween(1000)
+//                            )
+//                        ) {
+//                            dropletButtonItems.forEachIndexed { index, it ->
 //                                ColorButton(
 //                                    modifier = Modifier
 //                                        .fillMaxSize(1f),
@@ -74,7 +94,6 @@ class MainActivity : ComponentActivity() {
 //                                    prevSelectedIndex = prevSelectedIndex.value,
 //                                    index = index,
 //                                    selectedIndex = selectedItem.value,
-//                                    prevIndex = prevSelectedIndex.value,
 //                                    onClick = {
 //                                        prevSelectedIndex.value = selectedItem.value
 //                                        selectedItem.value = index
@@ -84,6 +103,37 @@ class MainActivity : ComponentActivity() {
 //                                    animationType = it.animationType,
 //                                    background = it.animationType.background
 //                                )
+//                            }
+//                        }
+
+                        AnimatedNavigationBar(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(horizontal = 8.dp, vertical = 20.dp)
+                                .height(72.dp),
+                            selectedIndex = selectedItem.value,
+                            ballColor = Color.White,
+                            cornerRadius = 20.dp,
+                            ballAnimation = com.exyte.navbar.navbar.animation.balltrajectory.Straight(
+                                tween(1000)
+                            ),
+                            indentAnimation = Straight(
+                                indentWidth = 50.dp,
+                                animationSpec = tween(1000)
+                            )
+                        ) {
+                            wiggleButtonItems.forEachIndexed { index, it ->
+                                WiggleButton(
+                                    modifier = Modifier
+                                        .fillMaxSize(1f),
+                                    isSelected = selectedItem.value == index,
+                                    onClick = {
+                                        prevSelectedIndex.value = selectedItem.value
+                                        selectedItem.value = index
+                                    },
+                                    icon = it.icon,
+                                    contentDescription = stringResource(id = it.description),
+                                )
                             }
                         }
                     }
@@ -92,6 +142,34 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+val wiggleButtonItems = listOf(
+    Item(
+        icon = R.drawable.outline_favorite,
+        isSelected = false,
+        description = R.string.Heart
+    ),
+    Item(
+        icon = R.drawable.outline_energy_leaf,
+        isSelected = false,
+        description = R.string.Heart
+    ),
+    Item(
+        icon = R.drawable.outline_water_drop,
+        isSelected = false,
+        description = R.string.Heart
+    ),
+    Item(
+        icon = R.drawable.outline_circle,
+        isSelected = false,
+        description = R.string.Heart
+    ),
+    Item(
+        icon = R.drawable.outline_laptop,
+        isSelected = false,
+        description = R.string.Heart
+    ),
+)
 
 val items = listOf(
     Item(
@@ -126,7 +204,7 @@ val dropletButtonItems = listOf(
         icon = R.drawable.icon_home,
         isSelected = true,
         description = R.string.Home,
-        animationType = AnimationType.PlusAnimation(
+        animationType = BellColorButton(
             animationSpec = spring(
                 dampingRatio = 7f,
                 stiffness = 3000f
@@ -141,10 +219,14 @@ val dropletButtonItems = listOf(
         icon = R.drawable.icon_bell,
         isSelected = false,
         description = R.string.Bell,
-        animationType = BellAnimation(
-            animationSpec = spring(
-                dampingRatio = 7f,
-                stiffness = 3000f
+        animationType = BellColorButton(
+            animationSpec =
+//            tween(
+//                700,
+//                easing = { OvershootInterpolator(.2f).getInterpolation(it) }),
+            spring(
+                dampingRatio = 5f,
+                stiffness = Spring.StiffnessMedium
             ),
             background = ButtonBackground(
                 icon = R.drawable.rectangle_background,
@@ -156,10 +238,10 @@ val dropletButtonItems = listOf(
         icon = R.drawable.icon_square,
         isSelected = false,
         description = R.string.Plus,
-        animationType = AnimationType.PlusAnimation(
+        animationType = PlusColorButton(
             animationSpec = spring(
-                dampingRatio = 7f,
-                stiffness = 3000f
+                dampingRatio = 0.3f,
+                stiffness = Spring.StiffnessVeryLow
             ),
             background = ButtonBackground(
                 icon = R.drawable.polygon_background,
@@ -171,10 +253,10 @@ val dropletButtonItems = listOf(
         icon = R.drawable.icon_calendar,
         isSelected = false,
         description = R.string.Calendar,
-        animationType = AnimationType.CalendarAnimation(
+        animationType = CalendarAnimation(
             animationSpec = spring(
-                dampingRatio = 7f,
-                stiffness = 3000f
+                dampingRatio = 0.3f,
+                stiffness = Spring.StiffnessVeryLow
             ),
             background = ButtonBackground(
                 icon = R.drawable.quadrangle_background,
@@ -186,10 +268,10 @@ val dropletButtonItems = listOf(
         icon = R.drawable.icon_gear,
         isSelected = false,
         description = R.string.Settings,
-        animationType = AnimationType.GearAnimation(
+        animationType = GearColorButton(
             animationSpec = spring(
-                dampingRatio = 7f,
-                stiffness = 3000f
+                dampingRatio = 0.3f,
+                stiffness = Spring.StiffnessVeryLow
             ),
             background = ButtonBackground(
                 icon = R.drawable.gear_background,
