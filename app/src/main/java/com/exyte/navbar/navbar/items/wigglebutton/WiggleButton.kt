@@ -1,6 +1,7 @@
 package com.exyte.navbar.navbar.items.wigglebutton
 
 import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import androidx.compose.ui.graphics.vector.RenderVectorGroup
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.exyte.navbar.navbar.utils.noRippleClickable
@@ -30,12 +32,16 @@ fun WiggleButton(
     modifier: Modifier = Modifier,
     isSelected: Boolean,
     onClick: () -> Unit,
-    icon: Int,
+    @DrawableRes icon: Int,
+    @DrawableRes backgroundIcon: Int,
     contentDescription: String = "",
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
     selectedColor: Color = Color.Black,
-    unselectedColor: Color = LightGray
+    unselectedColor: Color = LightGray,
+    backgroundIconColor: Color = Color.White,
+    arcColor: Color = Color.Blue,
+    iconSize: Dp = 25.dp,
 ) {
 
     Box(
@@ -47,15 +53,15 @@ fun WiggleButton(
 
         DrawWithBlendMode(
             modifier = Modifier
-                .noRippleClickable {
-                    onClick()
-                }
-                .size(20.dp)
+                .size(iconSize)
                 .align(Alignment.Center),
             icon = icon,
+            backgroundIcon = backgroundIcon,
             isSelected = isSelected,
-            arcColor = Color.Red,
-            contentDescription = contentDescription
+            arcColor = arcColor,
+            iconColor = backgroundIconColor,
+            backgroundIconColor = backgroundIconColor,
+            contentDescription = contentDescription,
         )
     }
 }
@@ -65,14 +71,20 @@ fun WiggleButton(
 fun DrawWithBlendMode(
     modifier: Modifier,
     isSelected: Boolean,
-    icon: Int,
+    @DrawableRes icon: Int,
+    @DrawableRes backgroundIcon: Int,
     contentDescription: String,
     arcColor: Color,
-    iconColor: Color = Color.Black
+    iconColor: Color,
+    backgroundIconColor: Color,
 ) {
 
     val vector = ImageVector.vectorResource(id = icon)
-    val painter = rememberVectorPainter(image = vector, blendMode = BlendMode.DstOver)
+    val painter = rememberVectorPainter(image = vector, blendMode = BlendMode.SrcIn)
+
+    val backgroundVector = ImageVector.vectorResource(id = backgroundIcon)
+    val backgroundPainter =
+        rememberVectorPainter(image = backgroundVector, blendMode = BlendMode.SrcIn)
 
     var canvasSize by remember {
         mutableStateOf(Size.Zero)
@@ -129,14 +141,21 @@ fun DrawWithBlendMode(
         contentDescription = contentDescription
     ) {
 
-        with(painter) {
+        with(backgroundPainter) {
             draw(
                 size = Size(canvasSize.width, canvasSize.width),
-                colorFilter = ColorFilter.tint(color = iconColor)
+                colorFilter = ColorFilter.tint(color = backgroundIconColor)
             )
         }
 
-//        drawPath(path, color = arcColor, blendMode = BlendMode.SrcAtop)
+        drawPath(path, color = arcColor, blendMode = BlendMode.SrcIn)
+
+        with(painter) {
+            draw(
+                size = Size(canvasSize.width, canvasSize.width),
+                colorFilter = ColorFilter.tint(color = Color(0xFF64419F))
+            )
+        }
     }
 }
 

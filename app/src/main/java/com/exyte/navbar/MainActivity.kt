@@ -1,7 +1,6 @@
 package com.exyte.navbar
 
 import android.os.Bundle
-import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.*
@@ -18,6 +17,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.exyte.navbar.navbar.AnimatedNavigationBar
+import com.exyte.navbar.navbar.animation.balltrajectory.Teleport
+import com.exyte.navbar.navbar.animation.indendshape.Height
 import com.exyte.navbar.navbar.animation.indendshape.Straight
 import com.exyte.navbar.navbar.items.colorButtons.*
 import com.exyte.navbar.navbar.items.wigglebutton.WiggleButton
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Box(
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(ElectricViolet)
@@ -70,45 +71,9 @@ class MainActivity : ComponentActivity() {
 //                            }
 //                        }
 
-//                        AnimatedNavigationBar(
-//                            modifier = Modifier
-//                                .align(Alignment.Center)
-//                                .padding(horizontal = 8.dp, vertical = 20.dp)
-//                                .height(72.dp),
-//                            selectedIndex = selectedItem.value,
-//                            ballColor = Color.White,
-//                            cornerRadius = 20.dp,
-//                            ballAnimation = com.exyte.navbar.navbar.animation.balltrajectory.Straight(
-//                                tween(1000)
-//                            ),
-//                            indentAnimation = Straight(
-//                                indentWidth = 50.dp,
-//                                animationSpec = tween(1000)
-//                            )
-//                        ) {
-//                            dropletButtonItems.forEachIndexed { index, it ->
-//                                ColorButton(
-//                                    modifier = Modifier
-//                                        .fillMaxSize(1f),
-//                                    isSelected = selectedItem.value == index,
-//                                    prevSelectedIndex = prevSelectedIndex.value,
-//                                    index = index,
-//                                    selectedIndex = selectedItem.value,
-//                                    onClick = {
-//                                        prevSelectedIndex.value = selectedItem.value
-//                                        selectedItem.value = index
-//                                    },
-//                                    icon = it.icon,
-//                                    contentDescription = stringResource(id = it.description),
-//                                    animationType = it.animationType,
-//                                    background = it.animationType.background
-//                                )
-//                            }
-//                        }
-
                         AnimatedNavigationBar(
                             modifier = Modifier
-                                .align(Alignment.Center)
+//                                .align(Alignment.Center)
                                 .padding(horizontal = 8.dp, vertical = 20.dp)
                                 .height(72.dp),
                             selectedIndex = selectedItem.value,
@@ -122,16 +87,54 @@ class MainActivity : ComponentActivity() {
                                 animationSpec = tween(1000)
                             )
                         ) {
+                            dropletButtonItems.forEachIndexed { index, it ->
+                                ColorButton(
+                                    modifier = Modifier
+                                        .fillMaxSize(1f),
+                                    isSelected = selectedItem.value == index,
+                                    prevSelectedIndex = prevSelectedIndex.value,
+                                    index = index,
+                                    selectedIndex = selectedItem.value,
+                                    onClick = {
+                                        prevSelectedIndex.value = selectedItem.value
+                                        selectedItem.value = index
+                                    },
+                                    icon = it.icon,
+                                    contentDescription = stringResource(id = it.description),
+                                    animationType = it.animationType,
+                                    background = it.animationType.background
+                                )
+                            }
+                        }
+
+                        AnimatedNavigationBar(
+                            modifier = Modifier
+//                                .align(Alignment.Center)
+                                .padding(horizontal = 8.dp, vertical = 20.dp)
+                                .height(72.dp),
+                            selectedIndex = selectedItem.value,
+                            ballColor = Color.White,
+                            cornerRadius = 20.dp,
+                            ballAnimation = Teleport(
+                                tween(1000)
+                            ),
+                            indentAnimation = Height(
+                                indentWidth = 50.dp,
+                                animationSpec = tween(1000)
+                            )
+                        ) {
                             wiggleButtonItems.forEachIndexed { index, it ->
                                 WiggleButton(
                                     modifier = Modifier
-                                        .fillMaxSize(1f),
+                                        .fillMaxSize(),
                                     isSelected = selectedItem.value == index,
                                     onClick = {
                                         prevSelectedIndex.value = selectedItem.value
                                         selectedItem.value = index
                                     },
                                     icon = it.icon,
+                                    backgroundIcon = it.backgroundIcon,
+                                    arcColor = Color(0xFFBCA1E7),
                                     contentDescription = stringResource(id = it.description),
                                 )
                             }
@@ -144,28 +147,33 @@ class MainActivity : ComponentActivity() {
 }
 
 val wiggleButtonItems = listOf(
-    Item(
+    WiggleButtonItem(
         icon = R.drawable.outline_favorite,
+        backgroundIcon = R.drawable.icon_favorite,
         isSelected = false,
         description = R.string.Heart
     ),
-    Item(
+    WiggleButtonItem(
         icon = R.drawable.outline_energy_leaf,
+        backgroundIcon = R.drawable.icon_energy_savings_leaf,
         isSelected = false,
         description = R.string.Heart
     ),
-    Item(
+    WiggleButtonItem(
         icon = R.drawable.outline_water_drop,
+        backgroundIcon = R.drawable.water_drop_icon,
         isSelected = false,
         description = R.string.Heart
     ),
-    Item(
+    WiggleButtonItem(
         icon = R.drawable.outline_circle,
+        backgroundIcon = R.drawable.icon_circle,
         isSelected = false,
         description = R.string.Heart
     ),
-    Item(
-        icon = R.drawable.outline_laptop,
+    WiggleButtonItem(
+        icon = R.drawable.baseline_laptop,
+        backgroundIcon = R.drawable.icon_laptop1,
         isSelected = false,
         description = R.string.Heart
     ),
@@ -188,7 +196,7 @@ val items = listOf(
         description = R.string.Message
     ),
     Item(
-        icon = R.drawable.heart,
+        icon = R.drawable.icon_heart,
         isSelected = false,
         description = R.string.Heart
     ),

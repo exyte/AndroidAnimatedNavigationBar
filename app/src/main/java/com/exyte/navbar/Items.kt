@@ -7,6 +7,17 @@ import com.exyte.navbar.navbar.items.colorButtons.ColorButtonAnimation
 import com.exyte.navbar.navbar.items.colorButtons.BellColorButton
 import com.exyte.navbar.navbar.items.colorButtons.ButtonBackground
 
+data class WiggleButtonItem(
+    @DrawableRes val backgroundIcon:Int,
+    @DrawableRes val icon: Int,
+    var isSelected: Boolean,
+    @StringRes val description: Int,
+    val animationType: ColorButtonAnimation = BellColorButton(
+        tween(500),
+        background = ButtonBackground(R.drawable.icon_plus)
+    ),
+)
+
 data class Item(
     @DrawableRes val icon: Int,
     var isSelected: Boolean,
