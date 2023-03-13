@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.*
 import com.exyte.navbar.navbar.animation.balltrajectory.BallAnimInfo
 import com.exyte.navbar.navbar.animation.balltrajectory.BallAnimation
 import com.exyte.navbar.navbar.animation.indendshape.IndentAnimation
-import com.exyte.navbar.navbar.animation.indendshape.ShapeInfo
+import com.exyte.navbar.navbar.shape.ShapeInfo
 import com.exyte.navbar.navbar.layout.animatedNavBarMeasurePolicy
 import com.exyte.navbar.navbar.utils.ballTransform
 import com.exyte.navbar.navbar.utils.toPxf
@@ -101,9 +101,8 @@ fun AnimatedNavigationBar(
 }
 
 val ballSize = 10.dp
-
 @Composable
-fun ColorBall(
+private fun ColorBall(
     modifier: Modifier = Modifier,
     ballColor: Color,
     ballAnimInfo: BallAnimInfo,

@@ -1,9 +1,9 @@
-package com.exyte.navbar.navbar.animation.indendshape
+package com.exyte.navbar.navbar.shape
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Dp
 
-data class ShapeInfo(
+internal data class ShapeInfo(
     val cornerRadius: Dp,
     val layoutOffset: Offset
 )

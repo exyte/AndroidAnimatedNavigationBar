@@ -15,10 +15,10 @@ import com.exyte.navbar.navbar.shape.IndentShapeData
 import com.exyte.navbar.navbar.utils.toPxf
 
 class Straight(
-    override val animationSpec: FiniteAnimationSpec<Float>,
-    override val indentWidth: Dp = 50.dp,
-    override val indentHeight: Dp = 20.dp,
-) : IndentAnimation(animationSpec, indentHeight, indentWidth) {
+    private val animationSpec: FiniteAnimationSpec<Float>,
+    private val indentWidth: Dp = 50.dp,
+    private val indentHeight: Dp = 20.dp,
+) : IndentAnimation {
 
     @Composable
     override fun animateIndentShapeAsState(
@@ -48,10 +48,6 @@ class Straight(
             targetValue = targetOffset.x,
             animationSpec = animationSpec
         )
-
-//        val position = remember {
-//            mutableStateOf(0f)
-//        }
 
         return remember(cornerRadius) {
             derivedStateOf {

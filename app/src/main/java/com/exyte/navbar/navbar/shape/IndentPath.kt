@@ -4,7 +4,6 @@ import android.graphics.PointF
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 
-
 class IndentPath(
     private val rect: Rect,
 ) {

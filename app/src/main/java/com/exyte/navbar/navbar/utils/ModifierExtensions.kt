@@ -10,7 +10,6 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.IntOffset
 import com.exyte.navbar.navbar.animation.balltrajectory.BallAnimInfo
-import java.nio.channels.FileLock
 
 fun Modifier.noRippleClickable(
     onClick: () -> Unit

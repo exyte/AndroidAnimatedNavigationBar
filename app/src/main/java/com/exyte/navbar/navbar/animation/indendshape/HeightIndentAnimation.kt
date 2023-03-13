@@ -1,6 +1,5 @@
 package com.exyte.navbar.navbar.animation.indendshape
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.runtime.*
@@ -17,10 +16,10 @@ import com.exyte.navbar.navbar.utils.lerp
 import com.exyte.navbar.navbar.utils.toPxf
 
 data class Height(
-    override val animationSpec: FiniteAnimationSpec<Float>,
-    override val indentWidth: Dp = 50.dp,
-    override val indentHeight: Dp = 20.dp,
-) : IndentAnimation(animationSpec, indentHeight, indentWidth) {
+    private val animationSpec: FiniteAnimationSpec<Float>,
+    private val indentWidth: Dp = 50.dp,
+    private val indentHeight: Dp = 20.dp,
+) : IndentAnimation {
 
     @Composable
     override fun animateIndentShapeAsState(
@@ -86,17 +85,9 @@ data class Height(
                 if (fraction.value <= 1f) {
                     shapeIndentHeight = lerp(indentHeight.toPxf(density), 0f, fraction.value)
                     xIndent = from.x
-                    Log.e(
-                        "fn;erk",
-                        "1fraction: ${fraction.value} shapeIndentHeight ${shapeIndentHeight}"
-                    )
                 } else {
                     shapeIndentHeight = lerp(0f, indentHeight.toPxf(density), fraction.value - 1f)
                     xIndent = to.x
-                    Log.e(
-                        "fn;erk",
-                        "2fraction: ${fraction.value} shapeIndentHeight ${shapeIndentHeight}"
-                    )
                 }
                 shape = shape.copy(
                     xIndent = xIndent,
