@@ -2,25 +2,28 @@ package com.exyte.navbar.navbar.animation.balltrajectory
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.spring
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.platform.LocalDensity
-import com.exyte.navbar.navbar.animation.shape.ShapeInfo
 import com.exyte.navbar.navbar.ballSize
 import com.exyte.navbar.navbar.utils.toPxf
 
+/**
+ *Describing teleport ball animation. Ball disappears in old location and reappears in the new one
+ *@param [animationSpec] animation spec of teleport ball process
+ */
 class Teleport(
-    val animationSpec: AnimationSpec<Float>
+    private val animationSpec: AnimationSpec<Float> = spring()
 ) : BallAnimation {
 
     @Composable
     override fun animateAsState(
         targetOffset: Offset,
-        layoutShapeInfo: ShapeInfo
+        layoutOffset: Offset
     ): State<BallAnimInfo> {
-        if (targetOffset.isUnspecified && layoutShapeInfo.layoutOffset.isUnspecified) {
+        if (targetOffset.isUnspecified && layoutOffset.isUnspecified) {
             return derivedStateOf { BallAnimInfo() }
         }
         var from by remember { mutableStateOf(Offset.Zero) }
@@ -28,22 +31,22 @@ class Teleport(
         val fraction = remember { Animatable(0f) }
 
         val density = LocalDensity.current
-        val offset by remember(targetOffset, layoutShapeInfo) {
+        val offset by remember(targetOffset, layoutOffset) {
             derivedStateOf {
                 mutableStateOf(
                     Offset(
-                        x = targetOffset.x + layoutShapeInfo.layoutOffset.x - ballSize.toPxf(density) / 2,
-                        y = targetOffset.y + layoutShapeInfo.layoutOffset.y
+                        x = targetOffset.x + layoutOffset.x - ballSize.toPxf(density) / 2,
+                        y = targetOffset.y + layoutOffset.y
                     )
                 )
             }
         }
 
         suspend fun setNewAnimationPoints() {
-            if(from == to){
-                from = offset.value
+            from = if(from == to){
+                offset.value
             } else {
-                from = to
+                to
             }
 
             to = offset.value

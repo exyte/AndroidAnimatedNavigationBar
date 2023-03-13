@@ -6,24 +6,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.platform.LocalDensity
-import com.exyte.navbar.navbar.animation.shape.ShapeInfo
 import com.exyte.navbar.navbar.ballSize
 import com.exyte.navbar.navbar.utils.toPxf
 
+/**
+ *Describing straight ball animation
+ *@param [animationSpec] animation spec of straight ball trajectory
+ */
+
 class Straight(
-    val animationSpec: AnimationSpec<Offset>
+    private val animationSpec: AnimationSpec<Offset>
 ) : BallAnimation {
     @Composable
-    override fun animateAsState(toOffset: Offset, layoutShapeInfo: ShapeInfo): State<BallAnimInfo> {
-        if (toOffset.isUnspecified && layoutShapeInfo.layoutOffset.isUnspecified) {
+    override fun animateAsState(targetOffset: Offset, layoutOffset: Offset): State<BallAnimInfo> {
+        if (targetOffset.isUnspecified && layoutOffset.isUnspecified) {
             return derivedStateOf { BallAnimInfo() }
         }
 
         var ballAnimInfo by remember { mutableStateOf(BallAnimInfo()) }
         val offset = animateOffsetAsState(
             targetValue = calculateOffset(
-                toOffset,
-                layoutShapeInfo,
+                targetOffset,
+                layoutOffset,
                 ballSize.toPxf(LocalDensity.current)
             ),
             animationSpec = animationSpec
@@ -37,9 +41,9 @@ class Straight(
         }
     }
 
-    private fun calculateOffset(offset: Offset, layoutShapeInfo: ShapeInfo, ballSizePx: Float) =
+    private fun calculateOffset(offset: Offset, layoutOffset: Offset, ballSizePx: Float) =
         Offset(
-            x = offset.x + layoutShapeInfo.layoutOffset.x - ballSizePx / 2f,
-            y = offset.y + layoutShapeInfo.layoutOffset.y
+            x = offset.x + layoutOffset.x - ballSizePx / 2f,
+            y = offset.y + layoutOffset.y
         )
 }

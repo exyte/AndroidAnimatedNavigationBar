@@ -55,7 +55,7 @@ fun Path.addRoundRectWithIndent(
         moveTo(cornerRadius, 0f)
 
         val xOffset = indentShapeData.xIndent - indentShapeData.width / 2
-        if (xOffset > cornerRadius/4) {
+        if (xOffset > cornerRadius/2) {
             addPath(
                 IndentPath(
                     Rect(

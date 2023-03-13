@@ -16,10 +16,24 @@ import androidx.compose.ui.unit.*
 import com.exyte.navbar.navbar.animation.balltrajectory.BallAnimInfo
 import com.exyte.navbar.navbar.animation.balltrajectory.BallAnimation
 import com.exyte.navbar.navbar.animation.indendshape.IndentAnimation
-import com.exyte.navbar.navbar.animation.shape.ShapeInfo
+import com.exyte.navbar.navbar.animation.indendshape.ShapeInfo
 import com.exyte.navbar.navbar.layout.animatedNavBarMeasurePolicy
 import com.exyte.navbar.navbar.utils.ballTransform
 import com.exyte.navbar.navbar.utils.toPxf
+
+/**
+ *A composable function that creates an animated navigation bar with a moving ball and indent
+ * to indicate the selected item.
+ *
+ *@param [modifier] Modifier to be applied to the navigation bar
+ *@param [selectedIndex] The index of the currently selected item
+ *@param [barColor] The color of the navigation bar
+ *@param [ballColor] The color of the moving ball
+ *@param [cornerRadius] The corner radius of the navigation bar
+ *@param [ballAnimation] The animation to be applied to the moving ball
+ *@param [indentAnimation] The animation to be applied to the navigation bar to indent selected item
+ *@param [content] The composable content of the navigation bar
+ */
 
 @Composable
 fun AnimatedNavigationBar(
@@ -57,30 +71,32 @@ fun AnimatedNavigationBar(
     )
 
     val ballAnimInfoState = ballAnimation.animateAsState(
-        toOffset = selectedItemOffset,
-        layoutShapeInfo = shapeInfo
+        targetOffset = selectedItemOffset,
+        layoutOffset = shapeInfo.layoutOffset
     )
 
-    Layout(
-        modifier = modifier
-            .onGloballyPositioned {
-                shapeInfo = shapeInfo.copy(layoutOffset = it.positionInParent())
-            }
-            .graphicsLayer {
-                clip = true
-                shape = indentShape.value
-            }
-            .background(barColor),
-        content = content,
-        measurePolicy = measurePolicy
-    )
-
-    if (ballAnimInfoState.value.offset.isSpecified) {
-        ColorBall(
-            ballAnimInfo = ballAnimInfoState.value,
-            ballColor = ballColor,
-            sizeDp = ballSize
+    Box() {
+        Layout(
+            modifier = modifier
+                .onGloballyPositioned {
+                    shapeInfo = shapeInfo.copy(layoutOffset = it.positionInParent())
+                }
+                .graphicsLayer(
+                    clip = true,
+                    shape = indentShape.value
+                )
+                .background(barColor),
+            content = content,
+            measurePolicy = measurePolicy
         )
+
+        if (ballAnimInfoState.value.offset.isSpecified) {
+            ColorBall(
+                ballAnimInfo = ballAnimInfoState.value,
+                ballColor = ballColor,
+                sizeDp = ballSize
+            )
+        }
     }
 }
 

@@ -49,6 +49,10 @@ class Straight(
             animationSpec = animationSpec
         )
 
+//        val position = remember {
+//            mutableStateOf(0f)
+//        }
+
         return remember(cornerRadius) {
             derivedStateOf {
                 shape = shape.copy(xIndent = position.value, cornerRadius = cornerRadius)

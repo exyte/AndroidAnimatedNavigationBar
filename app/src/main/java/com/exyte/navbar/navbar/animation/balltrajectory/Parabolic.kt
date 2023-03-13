@@ -4,28 +4,34 @@ import android.graphics.Path
 import android.graphics.PathMeasure
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.spring
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.exyte.navbar.navbar.animation.shape.ShapeInfo
 import com.exyte.navbar.navbar.ballSize
 import com.exyte.navbar.navbar.utils.toPxf
 
+/**
+ *Describing parabola ball animation
+ *@param [animationSpec] animation spec of parabolic ball trajectory
+ *@param [maxHeight] max height of parabola trajectory
+ */
+
 class Parabolic(
-    val animationSpec: FiniteAnimationSpec<Float>,
+    private val animationSpec: FiniteAnimationSpec<Float> = spring(),
     private val maxHeight: Dp = 100.dp,
 ) : BallAnimation {
     @Composable
-    override fun animateAsState(toOffset: Offset, layoutShapeInfo: ShapeInfo): State<BallAnimInfo> {
-        if (toOffset.isUnspecified && layoutShapeInfo.layoutOffset.isUnspecified) {
+    override fun animateAsState(targetOffset: Offset, layoutOffset: Offset): State<BallAnimInfo> {
+        if (targetOffset.isUnspecified && layoutOffset.isUnspecified) {
             return derivedStateOf { BallAnimInfo() }
         }
 
-        var from by remember { mutableStateOf(toOffset) }
-        var to by remember { mutableStateOf(toOffset) }
+        var from by remember { mutableStateOf(targetOffset) }
+        var to by remember { mutableStateOf(targetOffset) }
         val fraction = remember { Animatable(0f) }
 
         val path = remember { Path() }
@@ -41,8 +47,8 @@ class Parabolic(
             pathMeasurer.getPosTan(pathLength.value * fraction.value, pos, tan)
         }
 
-        LaunchedEffect(toOffset) {
-            var height = if (to != toOffset) {
+        LaunchedEffect(targetOffset) {
+            var height = if (to != targetOffset) {
                 maxHeightPx
             } else {
                 startMinHeight
@@ -50,11 +56,11 @@ class Parabolic(
 
             if (isNotRunning(fraction.value)) {
                 from = to
-                to = toOffset
+                to = targetOffset
             } else {
                 measurePosition()
                 from = Offset(x = pos[0], y = pos[1])
-                to = toOffset
+                to = targetOffset
                 height = maxHeightPx + pos[1]
             }
 
@@ -71,11 +77,11 @@ class Parabolic(
             mutableStateOf(BallAnimInfo())
         }
 
-        return remember(toOffset) {
+        return remember(targetOffset) {
             derivedStateOf {
                 measurePosition()
                 ballAnimInfo = ballAnimInfo.copy(
-                    offset = calculateNewOffset(pos, layoutShapeInfo, ballSize.toPxf(density))
+                    offset = calculateNewOffset(pos, layoutOffset, ballSize.toPxf(density))
                 )
                 ballAnimInfo
             }
@@ -93,10 +99,10 @@ class Parabolic(
         )
     }
 
-    private fun calculateNewOffset(pos: FloatArray, layoutShapeInfo: ShapeInfo, ballSizePx: Float) =
+    private fun calculateNewOffset(pos: FloatArray, layoutOffset: Offset, ballSizePx: Float) =
         Offset(
-            x = pos[0] + layoutShapeInfo.layoutOffset.x - (ballSizePx / 2),
-            y = pos[1] + layoutShapeInfo.layoutOffset.y
+            x = pos[0] + layoutOffset.x - (ballSizePx / 2),
+            y = pos[1] + layoutOffset.y
         )
 
     private fun isNotRunning(fraction: Float) = fraction == 0f || fraction == 1f
