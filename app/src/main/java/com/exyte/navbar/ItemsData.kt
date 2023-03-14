@@ -5,10 +5,12 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.exyte.navbar.navbar.items.colorButtons.*
+import com.exyte.navbar.colorButtons.*
 
+@Stable
 data class WiggleButtonItem(
     @DrawableRes val backgroundIcon:Int,
     @DrawableRes val icon: Int,
@@ -20,6 +22,7 @@ data class WiggleButtonItem(
     ),
 )
 
+@Stable
 data class Item(
     @DrawableRes val icon: Int,
     var isSelected: Boolean,
@@ -57,13 +60,13 @@ val wiggleButtonItems = listOf(
     ),
     WiggleButtonItem(
         icon = R.drawable.baseline_laptop,
-        backgroundIcon = R.drawable.icon_laptop1,
+        backgroundIcon = R.drawable.icon_laptop,
         isSelected = false,
         description = R.string.Heart
     ),
 )
 
-val items = listOf(
+val dropletButton = listOf(
     Item(
         icon = R.drawable.home,
         isSelected = false,
@@ -93,7 +96,7 @@ val items = listOf(
 
 val dropletButtonItems = listOf(
     Item(
-        icon = R.drawable.icon_home,
+        icon = R.drawable.outline_home,
         isSelected = true,
         description = R.string.Home,
         animationType = BellColorButton(

@@ -15,15 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.exyte.navbar.navbar.AnimatedNavigationBar
-import com.exyte.navbar.navbar.animation.balltrajectory.Parabolic
-import com.exyte.navbar.navbar.animation.balltrajectory.Teleport
-import com.exyte.navbar.navbar.animation.indendshape.Height
-import com.exyte.navbar.navbar.animation.indendshape.Straight
-import com.exyte.navbar.navbar.items.colorButtons.*
-import com.exyte.navbar.navbar.items.dropletbutton.DropletButton
-import com.exyte.navbar.navbar.items.wigglebutton.WiggleButton
-import com.exyte.navbar.navbar.utils.noRippleClickable
+import com.exyte.animatednavbar.AnimatedNavigationBar
+import com.exyte.animatednavbar.animation.balltrajectory.Parabolic
+import com.exyte.animatednavbar.animation.balltrajectory.Straight
+import com.exyte.animatednavbar.animation.balltrajectory.Teleport
+import com.exyte.animatednavbar.animation.indendshape.Height
+import com.exyte.animatednavbar.animation.indendshape.StraightIndent
+import com.exyte.animatednavbar.items.dropletbutton.DropletButton
+import com.exyte.animatednavbar.items.wigglebutton.WiggleButton
+import com.exyte.animatednavbar.utils.noRippleClickable
+import com.exyte.navbar.colorButtons.ColorButton
 import com.exyte.navbar.ui.theme.ElectricViolet
 import com.exyte.navbar.ui.theme.NavBarTheme
 import com.exyte.navbar.ui.theme.Purple
@@ -51,21 +52,24 @@ class MainActivity : ComponentActivity() {
                     ) {
 
                         val animationIndex = remember { mutableStateOf(0) }
+                        val prevAnimationIndex = remember { mutableStateOf(0) }
                         val itemsOrder = listOf(0, 1, 2, 4, 3, 0)
 
                         val finiteIntSequence = itemsOrder.asSequence()
                         val infiniteIntSequence = finiteIntSequence.repeat()
                         val iterator = infiniteIntSequence.take(100).iterator()
 
-                        var i = itemsOrder.iterator()
                         LaunchedEffect(replay.value) {
                             while (replay.value) {
-                                delay(1000)
+                                delay(1500)
+                                prevAnimationIndex.value = animationIndex.value
                                 animationIndex.value = iterator.next()
                             }
                         }
+
                         val selectedItem = remember { mutableStateOf(0) }
                         val prevSelectedIndex = remember { mutableStateOf(0) }
+
                         Spacer(
                             modifier = Modifier
                                 .fillMaxSize(1f)
@@ -77,16 +81,20 @@ class MainActivity : ComponentActivity() {
                         ) {
                             AnimatedNavigationBar(
                                 modifier = Modifier
-                                    .padding(horizontal = 8.dp, vertical = 20.dp)
-                                    .height(72.dp),
+                                    .padding(horizontal = 8.dp, vertical = 40.dp)
+                                    .height(85.dp),
                                 selectedIndex = animationIndex.value,
                                 ballColor = Color.White,
-                                cornerRadius = 20.dp,
-                                ballAnimation = com.exyte.navbar.navbar.animation.balltrajectory.Straight(
-                                    tween(1000)
+                                cornerRadius = 25.dp,
+                                ballAnimation = Straight(
+                                    spring(
+                                        dampingRatio = 0.6f,
+                                        stiffness = Spring.StiffnessVeryLow
+                                    )
                                 ),
-                                indentAnimation = Straight(
-                                    indentWidth = 50.dp,
+                                indentAnimation = StraightIndent(
+                                    indentWidth = 56.dp,
+                                    indentHeight = 15.dp,
                                     animationSpec = tween(1000)
                                 )
                             ) {
@@ -95,9 +103,9 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .fillMaxSize(1f),
                                         isSelected = animationIndex.value == index,
-                                        prevSelectedIndex = prevSelectedIndex.value,
+                                        prevSelectedIndex = prevAnimationIndex.value,
                                         index = index,
-                                        selectedIndex = selectedItem.value,
+                                        selectedIndex = animationIndex.value,
                                         onClick = {
                                             prevSelectedIndex.value = selectedItem.value
                                             selectedItem.value = index
@@ -112,19 +120,19 @@ class MainActivity : ComponentActivity() {
 
                             AnimatedNavigationBar(
                                 modifier = Modifier
-                                    .padding(horizontal = 8.dp, vertical = 20.dp)
-                                    .height(72.dp),
+                                    .padding(horizontal = 8.dp, vertical = 40.dp)
+                                    .height(85.dp),
                                 selectedIndex = animationIndex.value,
                                 ballColor = Color.White,
-                                cornerRadius = 10.dp,
+                                cornerRadius = 25.dp,
                                 ballAnimation = Parabolic(tween(1000)),
                                 indentAnimation = Height(
-                                    indentWidth = 60.dp,
-                                    indentHeight = 20.dp,
+                                    indentWidth = 56.dp,
+                                    indentHeight = 15.dp,
                                     animationSpec = tween(1000)
                                 )
                             ) {
-                                items.forEachIndexed { index, it ->
+                                dropletButton.forEachIndexed { index, it ->
                                     DropletButton(
                                         modifier = Modifier.fillMaxSize(),
                                         isSelected = animationIndex.value == index,
@@ -138,17 +146,18 @@ class MainActivity : ComponentActivity() {
 
                             AnimatedNavigationBar(
                                 modifier = Modifier
-                                    .padding(horizontal = 8.dp, vertical = 20.dp)
-                                    .height(72.dp),
+                                    .padding(horizontal = 8.dp, vertical = 40.dp)
+                                    .height(85.dp),
                                 selectedIndex = animationIndex.value,
                                 ballColor = Color.White,
-                                cornerRadius = 20.dp,
+                                cornerRadius = 25.dp,
                                 ballAnimation = Teleport(
-                                    tween(1000)
+                                    tween(1000, easing = LinearEasing)
                                 ),
                                 indentAnimation = Height(
-                                    indentWidth = 50.dp,
-                                    animationSpec = tween(1000)
+                                    indentWidth = 56.dp,
+                                    indentHeight = 15.dp,
+                                    animationSpec = tween(1000, easing = LinearEasing)
                                 )
                             ) {
                                 wiggleButtonItems.forEachIndexed { index, it ->
@@ -164,6 +173,7 @@ class MainActivity : ComponentActivity() {
                                         backgroundIcon = it.backgroundIcon,
                                         arcColor = Color(0xFFBCA1E7),
                                         contentDescription = stringResource(id = it.description),
+                                        enterExitAnimationSpec = tween(500, easing = LinearEasing),
                                     )
                                 }
                             }
