@@ -27,13 +27,13 @@ internal fun animateDropletButtonAsState(
     )
 
     var dropletButtonParams by remember { mutableStateOf(DropletButtonParams()) }
-    val isNeedToAnimate by rememberUpdatedState(newValue = isSelected)
+    val isAnimationRequired by rememberUpdatedState(newValue = isSelected)
 
     return remember {
         derivedStateOf {
             dropletButtonParams = dropletButtonParams.copy(
-                scale = if (isNeedToAnimate) scaleInterpolation(fraction.value) else 1f,
-                radius = if (isNeedToAnimate) lerp(0f, size, fraction.value) else 0f,
+                scale = if (isAnimationRequired) scaleInterpolation(fraction.value) else 1f,
+                radius = if (isAnimationRequired) lerp(0f, size, fraction.value) else 0f,
                 verticalOffset = lerp(0f, size, fraction.value)
             )
             dropletButtonParams

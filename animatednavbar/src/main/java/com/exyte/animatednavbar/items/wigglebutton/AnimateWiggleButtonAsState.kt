@@ -29,14 +29,14 @@ fun animateWiggleButtonAsState(
     )
 
     var wiggleButtonParams by remember { mutableStateOf(WiggleButtonParams()) }
-    val isNeedToAnimate by rememberUpdatedState(newValue = isSelected)
+    val isAnimationRequired by rememberUpdatedState(newValue = isSelected)
 
     return remember {
         derivedStateOf {
             wiggleButtonParams = wiggleButtonParams.copy(
                 scale = scaleInterpolator(enterExitFraction.value),
                 alpha = alphaInterpolator(enterExitFraction.value),
-                radius = if (isNeedToAnimate) calculateRadius(
+                radius = if (isAnimationRequired) calculateRadius(
                     maxRadius = maxRadius,
                     fraction = radiusInterpolator(wiggleFraction.value),
                     minRadiusFraction = 0.55f
