@@ -38,35 +38,35 @@ val wiggleButtonItems = listOf(
         icon = R.drawable.outline_favorite,
         backgroundIcon = R.drawable.icon_favorite,
         isSelected = false,
-        description = R.string.Heart
+        description = R.string.Heart,
     ),
     WiggleButtonItem(
         icon = R.drawable.outline_energy_leaf,
         backgroundIcon = R.drawable.icon_energy_savings_leaf,
         isSelected = false,
-        description = R.string.Heart
+        description = R.string.Leaf
     ),
     WiggleButtonItem(
         icon = R.drawable.outline_water_drop,
         backgroundIcon = R.drawable.water_drop_icon,
         isSelected = false,
-        description = R.string.Heart
+        description = R.string.Drop
     ),
     WiggleButtonItem(
         icon = R.drawable.outline_circle,
         backgroundIcon = R.drawable.icon_circle,
         isSelected = false,
-        description = R.string.Heart
+        description = R.string.Circle
     ),
     WiggleButtonItem(
         icon = R.drawable.baseline_laptop,
         backgroundIcon = R.drawable.icon_laptop,
         isSelected = false,
-        description = R.string.Heart
+        description = R.string.Laptop
     ),
 )
 
-val dropletButton = listOf(
+val dropletButtons = listOf(
     Item(
         icon = R.drawable.home,
         isSelected = false,
@@ -94,7 +94,7 @@ val dropletButton = listOf(
     ),
 )
 
-val dropletButtonItems = listOf(
+val colorButtons = listOf(
     Item(
         icon = R.drawable.outline_home,
         isSelected = true,

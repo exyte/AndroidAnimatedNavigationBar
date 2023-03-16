@@ -113,8 +113,7 @@ class Parabolic(
         layoutOffset: Offset,
         ballSizePx: Float,
         verticalOffset: Float
-    ) =
-        Offset(
+    ) = Offset(
             x = pos[0] + layoutOffset.x - (ballSizePx / 2),
             y = pos[1] + layoutOffset.y - verticalOffset
         )

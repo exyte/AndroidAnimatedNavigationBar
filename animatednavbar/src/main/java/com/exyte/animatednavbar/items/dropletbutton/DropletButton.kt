@@ -11,15 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
-import com.exyte.animatednavbar.items.wigglebutton.rememberVectorPainter
 import com.exyte.animatednavbar.utils.noRippleClickable
 import com.exyte.animatednavbar.utils.toPxf
 
@@ -50,63 +47,47 @@ fun DropletButton(
     size: Dp = 20.dp,
     animationSpec: AnimationSpec<Float> = remember { tween(300) }
 ) {
-    var canvasSize by remember {
-        mutableStateOf(Size.Zero)
-    }
-
-    val vector = ImageVector.vectorResource(id = icon)
-    val painter = rememberVectorPainter(image = vector, blendMode = BlendMode.DstOver)
-
     Box(
-        modifier = modifier
-            .onGloballyPositioned {
-                canvasSize = it.size.toSize()
-            }
-            .noRippleClickable {
-                onClick()
-            }
+        modifier = modifier.noRippleClickable { onClick() }
     ) {
         val density = LocalDensity.current
-
         val dropletButtonParams = animateDropletButtonAsState(
             isSelected = isSelected, animationSpec = animationSpec, size = size.toPxf(density)
         )
 
-        val iconOffset by remember(size,canvasSize) {
+        val sizePx = remember(size) { size.toPxf(density) }
+        val circleCenter by remember {
             derivedStateOf {
-                mutableStateOf((canvasSize.height - size.toPxf(density))/2)
+                mutableStateOf(sizePx / 2)
             }
         }
+
+        val vector = ImageVector.vectorResource(id = icon)
+        val painter = rememberVectorPainter(image = vector)
         Canvas(
             modifier = Modifier
-                .width(size)
-                .fillMaxHeight()
+                .size(size)
                 .align(Alignment.Center)
                 .graphicsLayer(
                     alpha = 0.99f,
                     scaleX = dropletButtonParams.value.scale,
                     scaleY = dropletButtonParams.value.scale,
-                )
-                .onGloballyPositioned {
-                    canvasSize = it.size.toSize()
-                },
-            contentDescription = contentDescription?:""
+                ),
+            contentDescription = contentDescription ?: ""
         ) {
-            translate(left = 0f, top = iconOffset.value) {
-                with(painter) {
-                    draw(
-                        size = Size(size.toPxf(density), size.toPxf(density)),
-                        colorFilter = ColorFilter.tint(color = iconColor)
-                    )
-                }
+            with(painter) {
+                draw(
+                    size = Size(sizePx, sizePx),
+                    colorFilter = ColorFilter.tint(color = iconColor)
+                )
             }
 
             drawCircle(
                 color = dropletColor,
                 radius = dropletButtonParams.value.radius,
                 center = Offset(
-                    canvasSize.width / 2,
-                    dropletButtonParams.value.verticalOffset + iconOffset.value - 20f
+                    circleCenter.value,
+                    dropletButtonParams.value.verticalOffset - 20f
                 ),
                 blendMode = BlendMode.SrcIn
             )

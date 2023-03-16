@@ -10,9 +10,9 @@ import java.lang.Float.max
 
 @Stable
 data class DropletButtonParams(
-    @FloatRange(from = 0.0, to = 1.0) val scale: Float,
-    val radius: Float,
-    val verticalOffset: Float,
+    @FloatRange(from = 0.0, to = 1.0) val scale: Float = 1f,
+    val radius: Float = 10f,
+    val verticalOffset: Float = 0f,
 )
 
 @Composable
@@ -21,33 +21,20 @@ internal fun animateDropletButtonAsState(
     animationSpec: AnimationSpec<Float> = remember { tween(300) },
     size: Float,
 ): State<DropletButtonParams> {
-    var from by remember { mutableStateOf(isSelected) }
-    var to by remember { mutableStateOf(isSelected) }
-
-    val animSpec by rememberUpdatedState(animationSpec)
-
-    val fraction1 = animateFloatAsState(
+    val fraction = animateFloatAsState(
         targetValue = if (isSelected) 1f else 0f,
-        animationSpec = animSpec
+        animationSpec = animationSpec
     )
 
-    var dropletButtonParams by remember {
-        mutableStateOf(DropletButtonParams(scale = 1f, radius = 10f, verticalOffset = 0f))
-    }
-
-    LaunchedEffect(isSelected) {
-        if (to != isSelected) {
-            from = to
-            to = isSelected
-        }
-    }
+    var dropletButtonParams by remember { mutableStateOf(DropletButtonParams()) }
+    val isNeedToAnimate by rememberUpdatedState(newValue = isSelected)
 
     return remember {
         derivedStateOf {
             dropletButtonParams = dropletButtonParams.copy(
-                scale = if (to) scaleInterpolation(fraction1.value) else 1f,
-                radius = if (to) lerp(0f, size, fraction1.value) else 0f,
-                verticalOffset = lerp(0f, size, fraction1.value)
+                scale = if (isNeedToAnimate) scaleInterpolation(fraction.value) else 1f,
+                radius = if (isNeedToAnimate) lerp(0f, size, fraction.value) else 0f,
+                verticalOffset = lerp(0f, size, fraction.value)
             )
             dropletButtonParams
         }

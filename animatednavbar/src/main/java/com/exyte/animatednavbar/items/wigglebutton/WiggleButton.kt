@@ -11,12 +11,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.RenderVectorGroup
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -37,9 +35,10 @@ import com.exyte.animatednavbar.utils.toPxf
  *@param icon Drawable resource of the ImageVector resource used for the icon
  *@param backgroundIcon Drawable resource of the ImageVector resource used for the background icon
  *@param contentDescription Content description used to describe the view for accessibility purposes
- *@param arcColor Color of the arc drawn on top of the view
+ *@param wiggleColor Color of the arc drawn on top of the view
  *@param iconSize Icon size
  *@param backgroundIconColor Color of the background icon in the view,
+ *@param outlineColor Outline icon color
  *@param enterExitAnimationSpec Animation spec for appearing/disappearing
  *@param wiggleAnimationSpec Animation spec for wiggle effect
  */
@@ -50,9 +49,10 @@ fun WiggleButton(
     onClick: () -> Unit,
     @DrawableRes icon: Int,
     @DrawableRes backgroundIcon: Int,
-    contentDescription: String = "",
+    contentDescription: String? = null,
     backgroundIconColor: Color = Color.White,
-    arcColor: Color = Color.Blue,
+    wiggleColor: Color = Color.Blue,
+    outlineColor: Color = Color.LightGray,
     iconSize: Dp = 25.dp,
     enterExitAnimationSpec: AnimationSpec<Float> = spring(),
     wiggleAnimationSpec: AnimationSpec<Float> =
@@ -73,8 +73,9 @@ fun WiggleButton(
             icon = icon,
             backgroundIcon = backgroundIcon,
             isSelected = isSelected,
-            arcColor = arcColor,
+            wiggleColor = wiggleColor,
             backgroundIconColor = backgroundIconColor,
+            outlineColor = outlineColor,
             contentDescription = contentDescription,
             enterExitAnimationSpec = enterExitAnimationSpec,
             wiggleAnimationSpec = wiggleAnimationSpec,
@@ -90,24 +91,22 @@ fun DrawWithBlendMode(
     isSelected: Boolean,
     @DrawableRes icon: Int,
     @DrawableRes backgroundIcon: Int,
-    contentDescription: String,
-    arcColor: Color,
+    contentDescription: String? = null,
+    wiggleColor: Color,
     size: Dp,
     backgroundIconColor: Color,
     enterExitAnimationSpec: AnimationSpec<Float>,
     wiggleAnimationSpec: AnimationSpec<Float>,
+    outlineColor: Color,
 ) {
 
     val vector = ImageVector.vectorResource(id = icon)
-    val painter = rememberVectorPainter(image = vector, blendMode = BlendMode.SrcIn)
+    val painter = rememberVectorPainter(image = vector)
 
     val backgroundVector = ImageVector.vectorResource(id = backgroundIcon)
-    val backgroundPainter =
-        rememberVectorPainter(image = backgroundVector, blendMode = BlendMode.SrcIn)
+    val backgroundPainter = rememberVectorPainter(image = backgroundVector)
 
-    var canvasSize by remember {
-        mutableStateOf(Size.Zero)
-    }
+    var canvasSize by remember { mutableStateOf(Size.Zero) }
 
     val density = LocalDensity.current
     val sizePx = remember(size) { size.toPxf(density) }
@@ -116,8 +115,9 @@ fun DrawWithBlendMode(
         isSelected = isSelected,
         enterExitAnimationSpec = enterExitAnimationSpec,
         wiggleAnimationSpec = wiggleAnimationSpec,
-        size = sizePx
+        maxRadius = sizePx
     )
+//    val wiggleButtonParams = remember { derivedStateOf { WiggleButtonParams(radius = 50f) }}
 
     val offset by remember {
         derivedStateOf {
@@ -130,16 +130,13 @@ fun DrawWithBlendMode(
     Canvas(
         modifier = modifier
             .graphicsLayer(
-                alpha = 0.99f,
+                alpha = wiggleButtonParams.value.alpha,
                 scaleX = wiggleButtonParams.value.scale,
                 scaleY = wiggleButtonParams.value.scale
             )
-            .alpha(alpha = wiggleButtonParams.value.alpha)
             .fillMaxSize()
-            .onGloballyPositioned {
-                canvasSize = it.size.toSize()
-            },
-        contentDescription = contentDescription
+            .onGloballyPositioned { canvasSize = it.size.toSize() },
+        contentDescription = contentDescription ?: ""
     ) {
 
         with(backgroundPainter) {
@@ -150,7 +147,7 @@ fun DrawWithBlendMode(
         }
 
         drawCircle(
-            color = arcColor,
+            color = wiggleColor,
             center = offset.value,
             radius = wiggleButtonParams.value.radius,
             blendMode = BlendMode.SrcIn
@@ -159,22 +156,8 @@ fun DrawWithBlendMode(
         with(painter) {
             draw(
                 size = Size(sizePx, sizePx),
-                colorFilter = ColorFilter.tint(color = Color(0xFF64419F))
+                colorFilter = ColorFilter.tint(color = outlineColor)
             )
         }
     }
 }
-
-@Composable
-fun rememberVectorPainter(image: ImageVector, blendMode: BlendMode) =
-    rememberVectorPainter(
-        defaultWidth = image.defaultWidth,
-        defaultHeight = image.defaultHeight,
-        viewportWidth = image.viewportWidth,
-        viewportHeight = image.viewportHeight,
-        name = image.name,
-        tintColor = image.tintColor,
-        tintBlendMode = blendMode,
-        autoMirror = image.autoMirror,
-        content = { _, _ -> RenderVectorGroup(group = image.root) }
-    )

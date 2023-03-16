@@ -8,4 +8,8 @@
     <string name="Plus">Plus</string>
     <string name="Calendar">Calendar</string>
     <string name="Settings">Settings</string>
+    <string name="Laptop">Laptop</string>
+    <string name="Circle">Circle</string>
+    <string name="Drop">Drop</string>
+    <string name="Leaf">Leaf</string>
 </resources>

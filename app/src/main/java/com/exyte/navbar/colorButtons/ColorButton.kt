@@ -41,7 +41,6 @@ abstract class ColorButtonAnimation(
 @Composable
 fun ColorButton(
     modifier: Modifier = Modifier,
-    isSelected: Boolean,
     index: Int,
     selectedIndex: Int,
     prevSelectedIndex: Int,
@@ -57,6 +56,8 @@ fun ColorButton(
     Box(
         modifier = modifier.noRippleClickable { onClick() }
     ) {
+        val isSelected = remember(selectedIndex, index) { selectedIndex == index }
+
         val fraction = animateFloatAsState(
             targetValue = if (isSelected) 1f else 0f,
             animationSpec = backgroundAnimationSpec
