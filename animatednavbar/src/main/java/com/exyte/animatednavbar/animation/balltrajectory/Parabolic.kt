@@ -38,7 +38,7 @@ class Parabolic(
         val path = remember { Path() }
         val pathMeasurer = remember { PathMeasure() }
         val pathLength = remember { mutableStateOf(0f) }
-        val pos = remember { floatArrayOf(0f, 0f) }
+        val pos = remember { floatArrayOf(Float.MAX_VALUE, Float.MAX_VALUE) }
         val tan = remember { floatArrayOf(0f, 0f) }
 
         val density = LocalDensity.current
@@ -81,18 +81,22 @@ class Parabolic(
         val verticalOffset = remember { 2.dp.toPxf(density) }
         val ballSizePx = remember { ballSize.toPxf(density) }
 
-        return remember(targetOffset) {
+        return remember {
             derivedStateOf {
                 measurePosition()
-                ballAnimInfo = ballAnimInfo.copy(
-                    offset = calculateNewOffset(
-                        pos,
-                        layoutOffset,
-                        ballSizePx,
-                        verticalOffset
+                if (pos[0] == Float.MAX_VALUE) {
+                    BallAnimInfo()
+                } else {
+                    ballAnimInfo = ballAnimInfo.copy(
+                        offset = calculateNewOffset(
+                            pos,
+                            layoutOffset,
+                            ballSizePx,
+                            verticalOffset
+                        )
                     )
-                )
-                ballAnimInfo
+                    ballAnimInfo
+                }
             }
         }
     }

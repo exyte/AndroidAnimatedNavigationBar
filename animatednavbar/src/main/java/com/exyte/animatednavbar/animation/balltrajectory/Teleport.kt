@@ -28,8 +28,8 @@ class Teleport(
         if (targetOffset.isUnspecified && layoutOffset.isUnspecified) {
             return remember { mutableStateOf(BallAnimInfo()) }
         }
-        var from by remember { mutableStateOf(Offset.Zero) }
-        var to by remember { mutableStateOf(Offset.Zero) }
+        var from by remember { mutableStateOf(Offset.Unspecified) }
+        var to by remember { mutableStateOf(Offset.Unspecified) }
         val fraction = remember { Animatable(0f) }
 
         val density = LocalDensity.current
@@ -47,7 +47,7 @@ class Teleport(
         }
 
         suspend fun setNewAnimationPoints() {
-            if (from == Offset.Zero) {
+            if (from == Offset.Unspecified) {
                 from = offset.value
                 fraction.snapTo(1f)
             } else {
