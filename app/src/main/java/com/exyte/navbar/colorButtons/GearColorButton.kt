@@ -23,26 +23,17 @@ class GearColorButton(
         isFromLeft: Boolean,
         icon: Int,
     ) {
-
-        val fraction = animateFloatAsState(
-            targetValue = if (isSelected) 1f else 0f,
+        val degree = animateFloatAsState(
+            targetValue = if (isSelected) maxGearAnimationDegree else 0f,
             animationSpec = animationSpec
         )
 
         Icon(
             modifier = modifier
-                .rotate(
-                    if (isSelected) gearRotateInterpolation(
-                        maxGearAnimationDegree,
-                        fraction.value
-                    ) else 0f
-                ),
+                .rotate(if (isSelected) degree.value else 0f),
             painter = painterResource(id = icon),
             contentDescription = null,
             tint = iconColor
         )
     }
-
-    private fun gearRotateInterpolation(maxDegree: Float, fraction: Float) =
-        fraction * maxDegree
 }

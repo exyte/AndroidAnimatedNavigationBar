@@ -32,14 +32,13 @@ data class CalendarAnimation(
         icon: Int,
     ) {
 
-        val fraction = animateFloatAsState(
-            targetValue = if (isSelected) 1f else 0f,
-            animationSpec = animationSpec
-        )
-
         Box(
             modifier = modifier
         ) {
+            val fraction = animateFloatAsState(
+                targetValue = if (isSelected) 1f else 0f,
+                animationSpec = animationSpec
+            )
 
             Icon(
                 modifier = Modifier

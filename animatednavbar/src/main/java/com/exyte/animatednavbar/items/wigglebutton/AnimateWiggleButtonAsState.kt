@@ -39,13 +39,15 @@ fun animateWiggleButtonAsState(
                 radius = if (isAnimationRequired) calculateRadius(
                     maxRadius = maxRadius,
                     fraction = radiusInterpolator(wiggleFraction.value),
-                    minRadiusFraction = 0.55f
-                ) else 0.55f * maxRadius
+                    minRadiusFraction = mildRadius
+                ) else mildRadius * maxRadius
             )
             wiggleButtonParams
         }
     }
 }
+
+const val mildRadius = 0.55f
 
 fun scaleInterpolator(fraction: Float): Float = 1 + fraction * 0.2f
 

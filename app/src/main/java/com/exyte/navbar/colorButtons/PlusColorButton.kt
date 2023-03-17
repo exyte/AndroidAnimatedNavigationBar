@@ -23,11 +23,6 @@ class PlusColorButton(
         isFromLeft: Boolean,
         icon: Int,
     ) {
-        val fraction = animateFloatAsState(
-            targetValue = if (isSelected) 1f else 0f,
-            animationSpec = animationSpec
-        )
-
         Box(
             modifier = modifier
         ) {
@@ -39,17 +34,18 @@ class PlusColorButton(
                 contentDescription = null
             )
 
+            val degrees = animateFloatAsState(
+                targetValue = if (isSelected) 90f else 0f,
+                animationSpec = animationSpec
+            )
+
             Icon(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .rotate(if (isSelected) plusRotationInterpolation(fraction.value) else 0f),
+                    .rotate(if (isSelected) degrees.value else 0f),
                 painter = painterResource(id = R.drawable.icon_plus),
                 contentDescription = null
             )
-
         }
-
     }
-
-    private fun plusRotationInterpolation(fraction: Float) = fraction * 90f
 }

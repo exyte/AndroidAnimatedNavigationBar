@@ -98,21 +98,16 @@ fun ColorButton(
     }
 }
 
-internal fun calculateBackgroundOffset(
+private fun calculateBackgroundOffset(
     isSelected: Boolean,
     isFromLeft: Boolean,
     fraction: Float,
     maxOffset: Float
-) = if (isSelected) {
-    if (isFromLeft) {
-        lerp(-maxOffset, 0f, fraction)
+): Float {
+    val offset = if (isFromLeft) -maxOffset else maxOffset
+    return if (isSelected) {
+        lerp(offset, 0f, fraction)
     } else {
-        lerp(maxOffset, 0f, fraction)
-    }
-} else {
-    if (isFromLeft) {
-        lerp(maxOffset, 0f, fraction)
-    } else {
-        lerp(-maxOffset, 0f, fraction)
+        lerp(-offset, 0f, fraction)
     }
 }
