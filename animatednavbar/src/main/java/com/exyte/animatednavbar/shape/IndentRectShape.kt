@@ -18,7 +18,7 @@ class IndentRectShape(
         density: Density
     ): Outline =
         Outline.Generic(
-            Path().addRoundRectWithIndent(size, indentShapeData)
+            Path().addRoundRectWithIndent(size, indentShapeData, layoutDirection)
         )
 
     fun copy(
@@ -39,6 +39,7 @@ class IndentRectShape(
 fun Path.addRoundRectWithIndent(
     size: Size,
     indentShapeData: IndentShapeData,
+    layoutDirection: LayoutDirection,
 ): Path {
     val width = size.width
     val height = size.height
@@ -54,8 +55,14 @@ fun Path.addRoundRectWithIndent(
 
         moveTo(cornerRadius, 0f)
 
-        val xOffset = indentShapeData.xIndent - indentShapeData.width / 2
-        if (xOffset > cornerRadius/4) {
+        val xOffset =
+            if (layoutDirection == LayoutDirection.Ltr) {
+                indentShapeData.xIndent - indentShapeData.width / 2
+            } else {
+                size.width - indentShapeData.xIndent - indentShapeData.width / 2
+            }
+
+        if (xOffset > cornerRadius / 4) {
             addPath(
                 IndentPath(
                     Rect(

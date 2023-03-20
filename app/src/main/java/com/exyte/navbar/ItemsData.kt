@@ -18,7 +18,7 @@ data class WiggleButtonItem(
     @StringRes val description: Int,
     val animationType: ColorButtonAnimation = BellColorButton(
         tween(500),
-        background = ButtonBackground(R.drawable.icon_plus)
+        background = ButtonBackground(R.drawable.plus)
     ),
 )
 
@@ -29,20 +29,20 @@ data class Item(
     @StringRes val description: Int,
     val animationType: ColorButtonAnimation = BellColorButton(
         tween(500),
-        background = ButtonBackground(R.drawable.icon_plus)
+        background = ButtonBackground(R.drawable.plus)
     ),
 )
 
 val wiggleButtonItems = listOf(
     WiggleButtonItem(
         icon = R.drawable.outline_favorite,
-        backgroundIcon = R.drawable.icon_favorite,
+        backgroundIcon = R.drawable.favorite,
         isSelected = false,
         description = R.string.Heart,
     ),
     WiggleButtonItem(
         icon = R.drawable.outline_energy_leaf,
-        backgroundIcon = R.drawable.icon_energy_savings_leaf,
+        backgroundIcon = R.drawable.energy_savings_leaf,
         isSelected = false,
         description = R.string.Leaf
     ),
@@ -54,13 +54,13 @@ val wiggleButtonItems = listOf(
     ),
     WiggleButtonItem(
         icon = R.drawable.outline_circle,
-        backgroundIcon = R.drawable.icon_circle,
+        backgroundIcon = R.drawable.circle,
         isSelected = false,
         description = R.string.Circle
     ),
     WiggleButtonItem(
         icon = R.drawable.baseline_laptop,
-        backgroundIcon = R.drawable.icon_laptop,
+        backgroundIcon = R.drawable.laptop,
         isSelected = false,
         description = R.string.Laptop
     ),
@@ -83,7 +83,7 @@ val dropletButtons = listOf(
         description = R.string.Message
     ),
     Item(
-        icon = R.drawable.icon_heart,
+        icon = R.drawable.heart,
         isSelected = false,
         description = R.string.Heart
     ),
@@ -111,7 +111,7 @@ val colorButtons = listOf(
         )
     ),
     Item(
-        icon = R.drawable.icon_bell,
+        icon = R.drawable.outline_bell,
         isSelected = false,
         description = R.string.Bell,
         animationType = BellColorButton(
@@ -126,7 +126,7 @@ val colorButtons = listOf(
         )
     ),
     Item(
-        icon = R.drawable.icon_square,
+        icon = R.drawable.rounded_rect,
         isSelected = false,
         description = R.string.Plus,
         animationType = PlusColorButton(
@@ -141,7 +141,7 @@ val colorButtons = listOf(
         )
     ),
     Item(
-        icon = R.drawable.icon_calendar,
+        icon = R.drawable.calendar,
         isSelected = false,
         description = R.string.Calendar,
         animationType = CalendarAnimation(
@@ -156,7 +156,7 @@ val colorButtons = listOf(
         )
     ),
     Item(
-        icon = R.drawable.icon_gear,
+        icon = R.drawable.gear,
         isSelected = false,
         description = R.string.Settings,
         animationType = GearColorButton(

@@ -4,10 +4,13 @@ import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 
 class GearColorButton(
     override val animationSpec: FiniteAnimationSpec<Float>,
@@ -23,8 +26,16 @@ class GearColorButton(
         isFromLeft: Boolean,
         icon: Int,
     ) {
+        val layoutDirection = LocalLayoutDirection.current
+        val gearAnimationDegree = remember {
+            if (layoutDirection == LayoutDirection.Ltr) {
+                maxGearAnimationDegree
+            } else {
+                -maxGearAnimationDegree
+            }
+        }
         val degree = animateFloatAsState(
-            targetValue = if (isSelected) maxGearAnimationDegree else 0f,
+            targetValue = if (isSelected) gearAnimationDegree else 0f,
             animationSpec = animationSpec
         )
 

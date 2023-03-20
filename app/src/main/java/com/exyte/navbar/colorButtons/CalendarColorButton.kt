@@ -8,12 +8,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.exyte.animatednavbar.utils.toPxf
 
@@ -40,6 +45,15 @@ data class CalendarAnimation(
                 animationSpec = animationSpec
             )
 
+            val layoutDirection = LocalLayoutDirection.current
+            val isLeftAnimation = remember(isFromLeft) {
+                if (layoutDirection == LayoutDirection.Ltr) {
+                    isFromLeft
+                } else {
+                    !isFromLeft
+                }
+            }
+
             Icon(
                 modifier = Modifier
                     .align(Alignment.Center)
@@ -47,7 +61,7 @@ data class CalendarAnimation(
                         translationX = if (isSelected) offset(
                             10f,
                             fraction.value,
-                            isFromLeft
+                            isLeftAnimation
                         ) else 0f
                     ),
                 painter = painterResource(id = icon),
@@ -57,7 +71,11 @@ data class CalendarAnimation(
 
             CalendarPoint(
                 modifier = Modifier.align(Alignment.Center),
-                offsetX = if (isSelected) offset(15f, fraction.value, isFromLeft) else 0f,
+                offsetX = if (isSelected) offset(
+                    15f,
+                    fraction.value,
+                    isLeftAnimation
+                ) else 0f,
                 iconColor = iconColor
             )
         }
@@ -79,9 +97,21 @@ fun CalendarPoint(
     offsetX: Float,
     iconColor: Color,
 ) {
+    val layoutDirection = LocalLayoutDirection.current
+    val density = LocalDensity.current
+    val internalOffset = remember {
+        if (layoutDirection == LayoutDirection.Ltr) {
+            Offset(3.5.dp.toPxf(density), 5.dp.toPxf(density))
+        } else {
+            Offset((-3.5).dp.toPxf(density), 5.dp.toPxf(density))
+        }
+    }
     Box(
         modifier = modifier
-            .graphicsLayer(translationX = 3.5.dp.toPxf() + offsetX, translationY = 5.dp.toPxf())
+            .graphicsLayer(
+                translationX = internalOffset.x + offsetX,
+                translationY = internalOffset.y
+            )
             .size(3.dp)
             .clip(CircleShape)
             .background(iconColor)
