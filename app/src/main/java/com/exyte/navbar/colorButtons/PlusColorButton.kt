@@ -1,5 +1,6 @@
 package com.exyte.navbar.colorButtons
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
@@ -29,12 +31,17 @@ class PlusColorButton(
         Box(
             modifier = modifier
         ) {
+            val color = animateColorAsState(
+                targetValue = if (isSelected) Color.Black else Color.LightGray,
+                label = "colorAnimation"
+            )
 
             Icon(
                 modifier = Modifier
                     .align(Alignment.Center),
                 painter = painterResource(id = R.drawable.rounded_rect),
-                contentDescription = null
+                contentDescription = null,
+                tint = color.value
             )
 
             val layoutDirection = LocalLayoutDirection.current
@@ -46,7 +53,8 @@ class PlusColorButton(
 
             val degrees = animateFloatAsState(
                 targetValue = if (isSelected) requiredDegrees else 0f,
-                animationSpec = animationSpec
+                animationSpec = animationSpec,
+                label = "degreesAnimation"
             )
 
             Icon(
@@ -54,7 +62,8 @@ class PlusColorButton(
                     .align(Alignment.Center)
                     .rotate(if (isSelected) degrees.value else 0f),
                 painter = painterResource(id = R.drawable.plus),
-                contentDescription = null
+                contentDescription = null,
+                tint = color.value
             )
         }
     }

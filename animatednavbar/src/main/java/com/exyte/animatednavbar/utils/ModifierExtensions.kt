@@ -29,11 +29,11 @@ fun Modifier.ballTransform(ballAnimInfo: BallAnimInfo) = this
             y = ballAnimInfo.offset.y.toInt()
         )
     }
-    .graphicsLayer(
-        scaleY = ballAnimInfo.scale,
-        scaleX = ballAnimInfo.scale,
+    .graphicsLayer {
+        scaleY = ballAnimInfo.scale
+        scaleX = ballAnimInfo.scale
         transformOrigin = TransformOrigin(pivotFractionX = 0.5f, 0f)
-    )
+    }
 
 fun Modifier.rotationWithTopCenterAnchor(degrees: Float) = this
     .graphicsLayer(

@@ -20,8 +20,8 @@ class Straight(
     private val animationSpec: AnimationSpec<Offset>
 ) : BallAnimation {
     @Composable
-    override fun animateAsState(targetOffset: Offset, layoutOffset: Offset): State<BallAnimInfo> {
-        if (targetOffset.isUnspecified && layoutOffset.isUnspecified) {
+    override fun animateAsState(targetOffset: Offset): State<BallAnimInfo> {
+        if (targetOffset.isUnspecified) {
             return remember { mutableStateOf(BallAnimInfo()) }
         }
 
@@ -33,12 +33,8 @@ class Straight(
 
         val offset = animateOffsetAsState(
             targetValue = calculateOffset(
-                targetOffset,
-                layoutOffset,
-                ballSizePx,
-                verticalOffset
-            ),
-            animationSpec = animationSpec
+                targetOffset, ballSizePx, verticalOffset
+            ), animationSpec = animationSpec
         )
 
         return remember {
@@ -50,13 +46,8 @@ class Straight(
     }
 
     private fun calculateOffset(
-        offset: Offset,
-        layoutOffset: Offset,
-        ballSizePx: Float,
-        verticalOffset: Float
-    ) =
-        Offset(
-            x = offset.x + layoutOffset.x - ballSizePx / 2f,
-            y = offset.y + layoutOffset.y - verticalOffset
-        )
+        offset: Offset, ballSizePx: Float, verticalOffset: Float
+    ) = Offset(
+        x = offset.x - ballSizePx / 2f, y = offset.y - verticalOffset
+    )
 }

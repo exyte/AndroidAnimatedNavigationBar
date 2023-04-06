@@ -10,10 +10,9 @@ interface BallAnimation {
 
     /**
      *@param [targetOffset] target offset
-     *@param [layoutOffset] offset of the navBar layout
      */
     @Composable
-    fun animateAsState(targetOffset: Offset, layoutOffset: Offset): State<BallAnimInfo>
+    fun animateAsState(targetOffset: Offset): State<BallAnimInfo>
 }
 
 /**

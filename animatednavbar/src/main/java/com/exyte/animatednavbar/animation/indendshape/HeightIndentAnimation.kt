@@ -65,14 +65,16 @@ class Height(
 
         LaunchedEffect(targetOffset) {
             when {
+                isNotRunning(fraction.value) -> {
+                    setNewAnimationPoints()
+                }
+
                 isExitIndentAnimating(fraction.value) -> {
                     changeToAnimationPointWhileAnimating()
                 }
+
                 isEnterIndentAnimating(fraction.value) -> {
                     changeToAndFromPointsWhileAnimating()
-                }
-                isNotRunning(fraction.value) -> {
-                    setNewAnimationPoints()
                 }
             }
             fraction.animateTo(2f, animationSpec)
@@ -100,7 +102,7 @@ class Height(
         }
     }
 
-    private fun isExitIndentAnimating(fraction: Float) = (fraction > 0f) && (fraction <= 1f)
-    private fun isEnterIndentAnimating(fraction: Float) = (fraction > 1f) && (fraction < 2f)
+    private fun isExitIndentAnimating(fraction: Float) = (fraction <= 1f)
+    private fun isEnterIndentAnimating(fraction: Float) = (fraction > 1f)
     private fun isNotRunning(fraction: Float) = fraction == 0f || fraction == 2f
 }

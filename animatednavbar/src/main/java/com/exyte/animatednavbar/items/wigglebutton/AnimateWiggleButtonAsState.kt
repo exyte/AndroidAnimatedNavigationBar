@@ -1,8 +1,17 @@
 package com.exyte.animatednavbar.items.wigglebutton
 
 import androidx.annotation.FloatRange
-import androidx.compose.animation.core.*
-import androidx.compose.runtime.*
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 
 @Stable
 data class WiggleButtonParams(

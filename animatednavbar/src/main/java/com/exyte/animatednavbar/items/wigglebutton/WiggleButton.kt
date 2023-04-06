@@ -117,7 +117,6 @@ fun DrawWithBlendMode(
         wiggleAnimationSpec = wiggleAnimationSpec,
         maxRadius = sizePx
     )
-//    val wiggleButtonParams = remember { derivedStateOf { WiggleButtonParams(radius = 50f) }}
 
     val offset by remember {
         derivedStateOf {

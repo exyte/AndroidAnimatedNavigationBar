@@ -1,5 +1,6 @@
 package com.exyte.navbar.colorButtons
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -21,12 +22,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.exyte.animatednavbar.utils.toPxf
+import com.exyte.navbar.ui.theme.LightGrey
 
 
 data class CalendarAnimation(
     override val animationSpec: FiniteAnimationSpec<Float>,
     override val background: ButtonBackground,
-    private val iconColor: Color = Color.Black
 ) : ColorButtonAnimation(animationSpec, background) {
 
     @Composable
@@ -42,7 +43,8 @@ data class CalendarAnimation(
         ) {
             val fraction = animateFloatAsState(
                 targetValue = if (isSelected) 1f else 0f,
-                animationSpec = animationSpec
+                animationSpec = animationSpec,
+                label = "fractionAnimation"
             )
 
             val layoutDirection = LocalLayoutDirection.current
@@ -53,6 +55,11 @@ data class CalendarAnimation(
                     !isFromLeft
                 }
             }
+
+            val color = animateColorAsState(
+                targetValue = if (isSelected) Color.Black else LightGrey,
+                label = "colorAnimation"
+            )
 
             Icon(
                 modifier = Modifier
@@ -66,7 +73,7 @@ data class CalendarAnimation(
                     ),
                 painter = painterResource(id = icon),
                 contentDescription = null,
-                tint = iconColor
+                tint = color.value
             )
 
             CalendarPoint(
@@ -76,7 +83,7 @@ data class CalendarAnimation(
                     fraction.value,
                     isLeftAnimation
                 ) else 0f,
-                iconColor = iconColor
+                iconColor = color.value
             )
         }
     }

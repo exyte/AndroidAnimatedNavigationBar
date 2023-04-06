@@ -1,11 +1,19 @@
 package com.exyte.navbar.colorButtons
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -60,7 +68,8 @@ fun ColorButton(
 
         val fraction = animateFloatAsState(
             targetValue = if (isSelected) 1f else 0f,
-            animationSpec = backgroundAnimationSpec
+            animationSpec = backgroundAnimationSpec,
+            label = "fractionAnimation",
         )
 
         val density = LocalDensity.current

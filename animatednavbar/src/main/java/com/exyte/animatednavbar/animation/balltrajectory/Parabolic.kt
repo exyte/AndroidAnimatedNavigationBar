@@ -26,8 +26,8 @@ class Parabolic(
     private val maxHeight: Dp = 100.dp,
 ) : BallAnimation {
     @Composable
-    override fun animateAsState(targetOffset: Offset, layoutOffset: Offset): State<BallAnimInfo> {
-        if (targetOffset.isUnspecified && layoutOffset.isUnspecified) {
+    override fun animateAsState(targetOffset: Offset): State<BallAnimInfo> {
+        if (targetOffset.isUnspecified) {
             return remember { mutableStateOf(BallAnimInfo()) }
         }
 
@@ -90,7 +90,6 @@ class Parabolic(
                     ballAnimInfo = ballAnimInfo.copy(
                         offset = calculateNewOffset(
                             pos,
-                            layoutOffset,
                             ballSizePx,
                             verticalOffset
                         )
@@ -114,13 +113,12 @@ class Parabolic(
 
     private fun calculateNewOffset(
         pos: FloatArray,
-        layoutOffset: Offset,
         ballSizePx: Float,
         verticalOffset: Float
     ) = Offset(
-            x = pos[0] + layoutOffset.x - (ballSizePx / 2),
-            y = pos[1] + layoutOffset.y - verticalOffset
-        )
+        x = pos[0] - (ballSizePx / 2),
+        y = pos[1] - verticalOffset
+    )
 
     private fun isNotRunning(fraction: Float) = fraction == 0f || fraction == 1f
 

@@ -1,5 +1,6 @@
 package com.exyte.navbar.colorButtons
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.material.Icon
@@ -11,11 +12,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
+import com.exyte.navbar.ui.theme.LightGrey
 
 class GearColorButton(
     override val animationSpec: FiniteAnimationSpec<Float>,
     override val background: ButtonBackground,
-    private val iconColor: Color = Color.Black,
     private val maxGearAnimationDegree: Float = 50f,
 ) : ColorButtonAnimation(animationSpec, background) {
 
@@ -36,7 +37,13 @@ class GearColorButton(
         }
         val degree = animateFloatAsState(
             targetValue = if (isSelected) gearAnimationDegree else 0f,
-            animationSpec = animationSpec
+            animationSpec = animationSpec,
+            label = "degreeAnimation"
+        )
+
+        val color = animateColorAsState(
+            targetValue = if (isSelected) Color.Black else LightGrey,
+            label = "colorAnimation"
         )
 
         Icon(
@@ -44,7 +51,7 @@ class GearColorButton(
                 .rotate(if (isSelected) degree.value else 0f),
             painter = painterResource(id = icon),
             contentDescription = null,
-            tint = iconColor
+            tint = color.value
         )
     }
 }

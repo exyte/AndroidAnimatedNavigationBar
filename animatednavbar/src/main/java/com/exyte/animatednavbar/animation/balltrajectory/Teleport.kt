@@ -23,9 +23,8 @@ class Teleport(
     @Composable
     override fun animateAsState(
         targetOffset: Offset,
-        layoutOffset: Offset
     ): State<BallAnimInfo> {
-        if (targetOffset.isUnspecified && layoutOffset.isUnspecified) {
+        if (targetOffset.isUnspecified) {
             return remember { mutableStateOf(BallAnimInfo()) }
         }
         var from by remember { mutableStateOf(Offset.Unspecified) }
@@ -35,12 +34,12 @@ class Teleport(
         val density = LocalDensity.current
         val verticalOffset = remember { 2.dp.toPxf(density) }
 
-        val offset by remember(targetOffset, layoutOffset) {
+        val offset by remember(targetOffset) {
             derivedStateOf {
                 mutableStateOf(
                     Offset(
-                        x = targetOffset.x + layoutOffset.x - ballSize.toPxf(density) / 2,
-                        y = targetOffset.y + layoutOffset.y - verticalOffset
+                        x = targetOffset.x - ballSize.toPxf(density) / 2,
+                        y = targetOffset.y - verticalOffset
                     )
                 )
             }
@@ -69,14 +68,16 @@ class Teleport(
 
         LaunchedEffect(offset) {
             when {
+                isAnimationNotRunning(fraction.value) -> {
+                    setNewAnimationPoints()
+                }
+
                 isExitBallAnimation(fraction.value) -> {
                     changeToAnimationPointWhileAnimating()
                 }
+
                 isEnterBallAnimation(fraction.value) -> {
                     changeToAndFromPointsWhileAnimating()
-                }
-                isAnimationNotRunning(fraction.value) -> {
-                    setNewAnimationPoints()
                 }
             }
             fraction.animateTo(2f, animationSpec)
@@ -104,8 +105,8 @@ class Teleport(
         }
     }
 
-    private fun isExitBallAnimation(fraction: Float) = fraction > 0f && fraction <= 1f
-    private fun isEnterBallAnimation(fraction: Float) = (fraction > 1f) && (fraction < 2f)
+    private fun isExitBallAnimation(fraction: Float) = fraction <= 1f
+    private fun isEnterBallAnimation(fraction: Float) = fraction > 1f
     private fun isAnimationNotRunning(fraction: Float) = fraction == 0f || fraction == 2f
 
 }

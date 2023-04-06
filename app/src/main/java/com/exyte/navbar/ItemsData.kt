@@ -8,11 +8,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.exyte.navbar.colorButtons.*
+import com.exyte.navbar.colorButtons.BellColorButton
+import com.exyte.navbar.colorButtons.ButtonBackground
+import com.exyte.navbar.colorButtons.CalendarAnimation
+import com.exyte.navbar.colorButtons.ColorButtonAnimation
+import com.exyte.navbar.colorButtons.GearColorButton
+import com.exyte.navbar.colorButtons.PlusColorButton
 
 @Stable
 data class WiggleButtonItem(
-    @DrawableRes val backgroundIcon:Int,
+    @DrawableRes val backgroundIcon: Int,
     @DrawableRes val icon: Int,
     var isSelected: Boolean,
     @StringRes val description: Int,
@@ -100,10 +105,7 @@ val colorButtons = listOf(
         isSelected = true,
         description = R.string.Home,
         animationType = BellColorButton(
-            animationSpec = spring(
-                dampingRatio = 7f,
-                stiffness = 3000f
-            ),
+            animationSpec = spring(dampingRatio = 0.7f, stiffness = 20f),
             background = ButtonBackground(
                 icon = R.drawable.circle_background,
                 offset = DpOffset(2.5.dp, 3.dp)
@@ -115,10 +117,7 @@ val colorButtons = listOf(
         isSelected = false,
         description = R.string.Bell,
         animationType = BellColorButton(
-            animationSpec = spring(
-                dampingRatio = 5f,
-                stiffness = Spring.StiffnessMedium
-            ),
+            animationSpec = spring(dampingRatio = 0.7f, stiffness = 20f),
             background = ButtonBackground(
                 icon = R.drawable.rectangle_background,
                 offset = DpOffset(1.dp, 2.dp)
@@ -136,7 +135,7 @@ val colorButtons = listOf(
             ),
             background = ButtonBackground(
                 icon = R.drawable.polygon_background,
-                offset = DpOffset(1.6.dp, 0.5.dp)
+                offset = DpOffset(1.6.dp, 2.dp)
             ),
         )
     ),
