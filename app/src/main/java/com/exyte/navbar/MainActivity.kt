@@ -16,10 +16,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +33,7 @@ import com.exyte.animatednavbar.animation.balltrajectory.Straight
 import com.exyte.animatednavbar.animation.balltrajectory.Teleport
 import com.exyte.animatednavbar.animation.indendshape.Height
 import com.exyte.animatednavbar.animation.indendshape.StraightIndent
+import com.exyte.animatednavbar.animation.indendshape.shapeCornerRadius
 import com.exyte.animatednavbar.items.dropletbutton.DropletButton
 import com.exyte.animatednavbar.items.wigglebutton.WiggleButton
 import com.exyte.navbar.colorButtons.ColorButton
@@ -41,9 +43,7 @@ import com.exyte.navbar.ui.theme.Purple
 import com.exyte.navbar.ui.theme.RoyalPurple
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.delay
 
-fun <T> Sequence<T>.repeat() = sequence { while (true) yieldAll(this@repeat) }
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,25 +62,9 @@ class MainActivity : ComponentActivity() {
                 Column(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 ) {
-                    val animationIndex = remember { mutableStateOf(0) }
-                    val prevAnimationIndex = remember { mutableStateOf(0) }
-                    val itemsOrder = listOf(0, 1, 2, 4, 3, 0)
-
-                    val finiteIntSequence = itemsOrder.asSequence()
-                    val infiniteIntSequence = finiteIntSequence.repeat()
-                    val iterator = infiniteIntSequence.take(100).iterator()
-
-                    LaunchedEffect(Unit) {
-                        while (true) {
-                            delay(1500)
-                            prevAnimationIndex.value = animationIndex.value
-                            animationIndex.value = iterator.next()
-                        }
-                    }
-
-//                    ColorButtonNavBar(animationIndex.value, prevAnimationIndex.value)
-//                    DropletButtonNavBar(animationIndex.value)
-                    WiggleButtonNavBar(animationIndex.value)
+                    ColorButtonNavBar()
+                    DropletButtonNavBar()
+                    WiggleButtonNavBar()
                 }
             }
         }
@@ -88,17 +72,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ColorButtonNavBar(anim: Int, prevAnim: Int) {
-    val selectedItem = remember { mutableStateOf(0) }
-    val prevSelectedIndex = remember { mutableStateOf(0) }
+fun ColorButtonNavBar() {
+    var selectedItem by remember { mutableStateOf(0) }
+    var prevSelectedIndex by remember { mutableStateOf(0) }
 
     AnimatedNavigationBar(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 60.dp)
             .height(85.dp),
-        selectedIndex = anim,
+        selectedIndex = selectedItem,
         ballColor = Color.White,
-        cornerRadius = 25.dp,
+        cornerRadius = shapeCornerRadius(25.dp),
         ballAnimation = Straight(
             spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessVeryLow)
         ),
@@ -111,12 +95,12 @@ fun ColorButtonNavBar(anim: Int, prevAnim: Int) {
         colorButtons.forEachIndexed { index, it ->
             ColorButton(
                 modifier = Modifier.fillMaxSize(),
-                prevSelectedIndex = prevAnim,
-                selectedIndex = anim,
+                prevSelectedIndex = prevSelectedIndex,
+                selectedIndex = selectedItem,
                 index = index,
                 onClick = {
-                    prevSelectedIndex.value = selectedItem.value
-                    selectedItem.value = index
+                    prevSelectedIndex = selectedItem
+                    selectedItem = index
                 },
                 icon = it.icon,
                 contentDescription = stringResource(id = it.description),
@@ -128,15 +112,15 @@ fun ColorButtonNavBar(anim: Int, prevAnim: Int) {
 }
 
 @Composable
-fun DropletButtonNavBar(value: Int) {
-    val selectedItem = remember { mutableStateOf(0) }
+fun DropletButtonNavBar() {
+    var selectedItem by remember { mutableStateOf(0) }
     AnimatedNavigationBar(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 40.dp)
             .height(85.dp),
-        selectedIndex = value,
+        selectedIndex = selectedItem,
         ballColor = Color.White,
-        cornerRadius = 25.dp,
+        cornerRadius = shapeCornerRadius(25.dp),
         ballAnimation = Parabolic(tween(Duration, easing = LinearOutSlowInEasing)),
         indentAnimation = Height(
             indentWidth = 56.dp,
@@ -149,8 +133,8 @@ fun DropletButtonNavBar(value: Int) {
         dropletButtons.forEachIndexed { index, it ->
             DropletButton(
                 modifier = Modifier.fillMaxSize(),
-                isSelected = value == index,
-                onClick = { selectedItem.value = index },
+                isSelected = selectedItem == index,
+                onClick = { selectedItem = index },
                 icon = it.icon,
                 dropletColor = Purple,
                 animationSpec = tween(durationMillis = Duration, easing = LinearEasing)
@@ -160,16 +144,16 @@ fun DropletButtonNavBar(value: Int) {
 }
 
 @Composable
-fun WiggleButtonNavBar(value: Int) {
-    val selectedItem = remember { mutableStateOf(0) }
+fun WiggleButtonNavBar() {
+    var selectedItem by remember { mutableStateOf(0) }
 
     AnimatedNavigationBar(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 40.dp)
             .height(85.dp),
-        selectedIndex = value,
+        selectedIndex = selectedItem,
         ballColor = Color.White,
-        cornerRadius = 25.dp,
+        cornerRadius = shapeCornerRadius(25.dp),
         ballAnimation = Teleport(tween(Duration, easing = LinearEasing)),
         indentAnimation = Height(
             indentWidth = 56.dp,
@@ -182,8 +166,8 @@ fun WiggleButtonNavBar(value: Int) {
         wiggleButtonItems.forEachIndexed { index, it ->
             WiggleButton(
                 modifier = Modifier.fillMaxSize(),
-                isSelected = value == index,
-                onClick = { selectedItem.value = index },
+                isSelected = selectedItem == index,
+                onClick = { selectedItem = index },
                 icon = it.icon,
                 backgroundIcon = it.backgroundIcon,
                 wiggleColor = LightPurple,
