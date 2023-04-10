@@ -17,15 +17,15 @@ import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.exyte.animatednavbar.animation.balltrajectory.BallAnimInfo
 import com.exyte.animatednavbar.animation.balltrajectory.BallAnimation
 import com.exyte.animatednavbar.animation.indendshape.IndentAnimation
+import com.exyte.animatednavbar.animation.indendshape.ShapeCornerRadius
+import com.exyte.animatednavbar.animation.indendshape.shapeCornerRadius
 import com.exyte.animatednavbar.layout.animatedNavBarMeasurePolicy
 import com.exyte.animatednavbar.utils.ballTransform
-import com.exyte.animatednavbar.utils.toPxf
 
 /**
  *A composable function that creates an animated navigation bar with a moving ball and indent
@@ -47,7 +47,7 @@ fun AnimatedNavigationBar(
     selectedIndex: Int,
     barColor: Color = Color.White,
     ballColor: Color = Color.Red,
-    cornerRadius: Dp = 0.dp,
+    cornerRadius: ShapeCornerRadius = shapeCornerRadius(0f),
     ballAnimation: BallAnimation,
     indentAnimation: IndentAnimation,
     content: @Composable () -> Unit,
@@ -66,9 +66,8 @@ fun AnimatedNavigationBar(
         }
     }
 
-    val density = LocalDensity.current
     val indentShape = indentAnimation.animateIndentShapeAsState(
-        cornerRadius = cornerRadius.toPxf(density),
+        shapeCornerRadius = cornerRadius,
         targetOffset = selectedItemOffset
     )
 

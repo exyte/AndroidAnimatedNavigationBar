@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import com.exyte.animatednavbar.animation.indendshape.ShapeCornerRadius
 
 class IndentRectShape(
     private val indentShapeData: IndentShapeData,
@@ -22,7 +23,7 @@ class IndentRectShape(
         )
 
     fun copy(
-        cornerRadius: Float = indentShapeData.cornerRadius,
+        cornerRadius: ShapeCornerRadius = indentShapeData.cornerRadius,
         xIndent: Float = indentShapeData.xIndent,
         yIndent: Float = indentShapeData.height,
         ballSize: Float = indentShapeData.ballOffset,
@@ -43,17 +44,12 @@ fun Path.addRoundRectWithIndent(
 ): Path {
     val width = size.width
     val height = size.height
-    val cornerRadius = if (size.height > indentShapeData.cornerRadius) {
-        indentShapeData.cornerRadius
-    } else {
-        size.height
-    }
-    val arcRectSize = Size(cornerRadius, cornerRadius)
+    val cornerRadius = indentShapeData.cornerRadius
     val sweepAngleDegrees = 90f
 
     return apply {
 
-        moveTo(cornerRadius, 0f)
+        moveTo(chooseCornerSize(size.height, cornerRadius.topLeft), 0f)
 
         val xOffset =
             if (layoutDirection == LayoutDirection.Ltr) {
@@ -62,7 +58,7 @@ fun Path.addRoundRectWithIndent(
                 size.width - indentShapeData.xIndent - indentShapeData.width / 2
             }
 
-        if (xOffset > cornerRadius / 4) {
+        if (xOffset > cornerRadius.topLeft / 4) {
             addPath(
                 IndentPath(
                     Rect(
@@ -76,37 +72,57 @@ fun Path.addRoundRectWithIndent(
             )
         }
 
-        lineTo(width - cornerRadius, 0f)
+        lineTo(width - cornerRadius.topRight, 0f)
         arcTo(
-            rect = Rect(offset = Offset(width - cornerRadius, 0f), size = arcRectSize),
+            rect = Rect(
+                offset = Offset(width - cornerRadius.topRight, 0f),
+                size = Size(cornerRadius.topRight, cornerRadius.topRight)
+            ),
             startAngleDegrees = 270f,
             sweepAngleDegrees = sweepAngleDegrees,
             forceMoveTo = false
         )
-        lineTo(width, height - cornerRadius)
+        lineTo(width, height - cornerRadius.bottomRight)
         arcTo(
             rect = Rect(
-                offset = Offset(width - cornerRadius, height - cornerRadius),
-                size = arcRectSize
+                offset = Offset(
+                    width - cornerRadius.bottomRight,
+                    height - cornerRadius.bottomRight
+                ),
+                size = Size(cornerRadius.bottomRight, cornerRadius.bottomRight)
             ),
             startAngleDegrees = 0f,
             sweepAngleDegrees = sweepAngleDegrees,
             forceMoveTo = false
         )
-        lineTo(width - cornerRadius, height)
+        lineTo(width - cornerRadius.bottomLeft, height)
         arcTo(
-            rect = Rect(offset = Offset(0f, height - cornerRadius), size = arcRectSize),
+            rect = Rect(
+                offset = Offset(0f, height - cornerRadius.bottomLeft),
+                size = Size(cornerRadius.bottomLeft, cornerRadius.bottomLeft)
+            ),
             startAngleDegrees = 90f,
             sweepAngleDegrees = sweepAngleDegrees,
             forceMoveTo = false
         )
-        lineTo(0f, cornerRadius)
+        lineTo(0f, cornerRadius.topLeft)
         arcTo(
-            rect = Rect(offset = Offset(0f, 0f), size = arcRectSize),
+            rect = Rect(
+                offset = Offset(0f, 0f),
+                size = Size(cornerRadius.topLeft, cornerRadius.topLeft)
+            ),
             startAngleDegrees = 180f,
             sweepAngleDegrees = sweepAngleDegrees,
             forceMoveTo = false
         )
         close()
+    }
+}
+
+fun chooseCornerSize(sizeHeight: Float, cornerRadius: Float): Float {
+    return if (sizeHeight > cornerRadius) {
+        cornerRadius
+    } else {
+        sizeHeight
     }
 }
