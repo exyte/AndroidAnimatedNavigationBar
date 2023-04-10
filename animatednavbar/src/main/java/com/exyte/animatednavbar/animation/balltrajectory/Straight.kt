@@ -2,7 +2,12 @@ package com.exyte.animatednavbar.animation.balltrajectory
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateOffsetAsState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.platform.LocalDensity
@@ -25,23 +30,20 @@ class Straight(
             return remember { mutableStateOf(BallAnimInfo()) }
         }
 
-        var ballAnimInfo by remember { mutableStateOf(BallAnimInfo()) }
-
         val density = LocalDensity.current
         val verticalOffset = remember { 2.dp.toPxf(density) }
         val ballSizePx = remember { ballSize.toPxf(density) }
 
         val offset = animateOffsetAsState(
-            targetValue = calculateOffset(
-                targetOffset, ballSizePx, verticalOffset
-            ), animationSpec = animationSpec
+            targetValue = calculateOffset(targetOffset, ballSizePx, verticalOffset),
+            animationSpec = animationSpec
         )
 
-        return remember {
-            derivedStateOf {
-                ballAnimInfo = ballAnimInfo.copy(offset = offset.value)
-                ballAnimInfo
-            }
+        return produceState(
+            initialValue = BallAnimInfo(),
+            key1 = offset.value
+        ) {
+            this.value = this.value.copy(offset = offset.value)
         }
     }
 

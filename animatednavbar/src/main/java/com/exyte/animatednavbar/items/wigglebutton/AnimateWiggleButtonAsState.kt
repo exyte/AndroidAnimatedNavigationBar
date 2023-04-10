@@ -1,17 +1,8 @@
 package com.exyte.animatednavbar.items.wigglebutton
 
 import androidx.annotation.FloatRange
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
+import androidx.compose.animation.core.*
+import androidx.compose.runtime.*
 
 @Stable
 data class WiggleButtonParams(
@@ -37,22 +28,22 @@ fun animateWiggleButtonAsState(
         animationSpec = wiggleAnimationSpec
     )
 
-    var wiggleButtonParams by remember { mutableStateOf(WiggleButtonParams()) }
     val isAnimationRequired by rememberUpdatedState(newValue = isSelected)
 
-    return remember {
-        derivedStateOf {
-            wiggleButtonParams = wiggleButtonParams.copy(
-                scale = scaleInterpolator(enterExitFraction.value),
-                alpha = alphaInterpolator(enterExitFraction.value),
-                radius = if (isAnimationRequired) calculateRadius(
-                    maxRadius = maxRadius,
-                    fraction = radiusInterpolator(wiggleFraction.value),
-                    minRadiusFraction = mildRadius
-                ) else mildRadius * maxRadius
-            )
-            wiggleButtonParams
-        }
+    return produceState(
+        initialValue = WiggleButtonParams(),
+        key1 = enterExitFraction.value,
+        key2 = wiggleFraction.value
+    ) {
+        this.value = this.value.copy(
+            scale = scaleInterpolator(enterExitFraction.value),
+            alpha = alphaInterpolator(enterExitFraction.value),
+            radius = if (isAnimationRequired) calculateRadius(
+                maxRadius = maxRadius * 0.8f,
+                fraction = radiusInterpolator(wiggleFraction.value),
+                minRadius = mildRadius * maxRadius
+            ) else mildRadius * maxRadius
+        )
     }
 }
 
@@ -65,8 +56,8 @@ fun alphaInterpolator(fraction: Float): Float = fraction / 2 + 0.5f - 0.01f
 fun calculateRadius(
     maxRadius: Float,
     fraction: Float,
-    @FloatRange(from = 0.0, to = 1.0) minRadiusFraction: Float = 0.1f,
-) = (fraction * (1 - minRadiusFraction) + minRadiusFraction) * maxRadius
+    minRadius: Float,
+) = (fraction * (maxRadius - minRadius)) + minRadius
 
 fun radiusInterpolator(
     fraction: Float

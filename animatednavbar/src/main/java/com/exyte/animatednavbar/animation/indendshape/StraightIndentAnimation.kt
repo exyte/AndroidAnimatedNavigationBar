@@ -5,11 +5,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.Shape
@@ -31,37 +29,36 @@ class StraightIndent(
     @Composable
     override fun animateIndentShapeAsState(
         targetOffset: Offset,
-        cornerRadius: Float
+        shapeCornerRadius: ShapeCornerRadius
     ): State<Shape> {
         if (targetOffset.isUnspecified) {
             return remember { mutableStateOf(IndentRectShape(IndentShapeData())) }
         }
 
         val density = LocalDensity.current
-        var shape by remember {
-            mutableStateOf(
-                IndentRectShape(
-                    indentShapeData = IndentShapeData(
-                        xIndent = targetOffset.x,
-                        height = indentHeight.toPxf(density),
-                        ballOffset = ballSize.toPxf(density) / 2f,
-                        width = indentWidth.toPxf(density),
-                        cornerRadius = cornerRadius
-                    )
-                )
-            )
-        }
 
         val position = animateFloatAsState(
             targetValue = targetOffset.x,
             animationSpec = animationSpec
         )
 
-        return remember(cornerRadius) {
-            derivedStateOf {
-                shape = shape.copy(xIndent = position.value, cornerRadius = cornerRadius)
-                shape
-            }
+        return produceState(
+            initialValue = IndentRectShape(
+                indentShapeData = IndentShapeData(
+                    xIndent = targetOffset.x,
+                    height = indentHeight.toPxf(density),
+                    ballOffset = ballSize.toPxf(density) / 2f,
+                    width = indentWidth.toPxf(density),
+                    cornerRadius = shapeCornerRadius
+                )
+            ),
+            key1 = position.value,
+            key2 = shapeCornerRadius
+        ) {
+            this.value = this.value.copy(
+                xIndent = position.value,
+                cornerRadius = shapeCornerRadius
+            )
         }
     }
 }

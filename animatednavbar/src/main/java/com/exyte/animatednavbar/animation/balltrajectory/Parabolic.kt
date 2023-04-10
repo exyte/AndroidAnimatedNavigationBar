@@ -5,7 +5,15 @@ import android.graphics.PathMeasure
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.spring
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.platform.LocalDensity
@@ -74,28 +82,26 @@ class Parabolic(
             fraction.animateTo(1f, animationSpec)
         }
 
-        var ballAnimInfo by remember {
-            mutableStateOf(BallAnimInfo())
-        }
-
         val verticalOffset = remember { 2.dp.toPxf(density) }
         val ballSizePx = remember { ballSize.toPxf(density) }
 
-        return remember {
-            derivedStateOf {
-                measurePosition()
-                if (pos[0] == Float.MAX_VALUE) {
-                    BallAnimInfo()
-                } else {
-                    ballAnimInfo = ballAnimInfo.copy(
-                        offset = calculateNewOffset(
-                            pos,
-                            ballSizePx,
-                            verticalOffset
-                        )
+        return produceState(
+            initialValue = BallAnimInfo(),
+            key1 = pos,
+            key2 = ballSizePx,
+            key3 = fraction.value,
+        ) {
+            measurePosition()
+            if (pos[0] == Float.MAX_VALUE) {
+                BallAnimInfo()
+            } else {
+                this.value = this.value.copy(
+                    offset = calculateNewOffset(
+                        pos,
+                        ballSizePx,
+                        verticalOffset
                     )
-                    ballAnimInfo
-                }
+                )
             }
         }
     }

@@ -7,12 +7,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import com.exyte.animatednavbar.utils.lerp
 import java.lang.Float.max
 
@@ -33,19 +31,17 @@ internal fun animateDropletButtonAsState(
         targetValue = if (isSelected) 1f else 0f,
         animationSpec = animationSpec
     )
-
-    var dropletButtonParams by remember { mutableStateOf(DropletButtonParams()) }
     val isAnimationRequired by rememberUpdatedState(newValue = isSelected)
 
-    return remember {
-        derivedStateOf {
-            dropletButtonParams = dropletButtonParams.copy(
-                scale = if (isAnimationRequired) scaleInterpolation(fraction.value) else 1f,
-                radius = if (isAnimationRequired) lerp(0f, size, fraction.value) else 0f,
-                verticalOffset = lerp(0f, size, fraction.value)
-            )
-            dropletButtonParams
-        }
+    return produceState(
+        initialValue = DropletButtonParams(),
+        key1 = fraction.value
+    ) {
+        this.value = this.value.copy(
+            scale = if (isAnimationRequired) scaleInterpolation(fraction.value) else 1f,
+            radius = if (isAnimationRequired) lerp(0f, size, fraction.value) else 0f,
+            verticalOffset = lerp(0f, size, fraction.value)
+        )
     }
 }
 

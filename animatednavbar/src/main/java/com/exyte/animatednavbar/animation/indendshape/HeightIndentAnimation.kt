@@ -2,11 +2,20 @@ package com.exyte.animatednavbar.animation.indendshape
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.exyte.animatednavbar.ballSize
@@ -25,7 +34,7 @@ class Height(
     @Composable
     override fun animateIndentShapeAsState(
         targetOffset: Offset,
-        cornerRadius: Float
+        shapeCornerRadius: ShapeCornerRadius
     ): State<Shape> {
         if (targetOffset.isUnspecified) {
             return remember { mutableStateOf(IndentRectShape(IndentShapeData())) }
@@ -36,16 +45,6 @@ class Height(
         var from by remember { mutableStateOf(Offset.Zero) }
 
         val density = LocalDensity.current
-        var shape by remember {
-            mutableStateOf(
-                IndentRectShape(
-                    indentShapeData = IndentShapeData(
-                        ballOffset = ballSize.toPxf(density) / 2f,
-                        width = indentWidth.toPxf(density),
-                    )
-                )
-            )
-        }
 
         suspend fun setNewAnimationPoints() {
             from = to
@@ -80,25 +79,29 @@ class Height(
             fraction.animateTo(2f, animationSpec)
         }
 
-        var shapeIndentHeight: Float
-        var xIndent: Float
-
-        return remember(cornerRadius) {
-            derivedStateOf {
-                if (fraction.value <= 1f) {
-                    shapeIndentHeight = lerp(indentHeight.toPxf(density), 0f, fraction.value)
-                    xIndent = from.x
-                } else {
-                    shapeIndentHeight = lerp(0f, indentHeight.toPxf(density), fraction.value - 1f)
-                    xIndent = to.x
-                }
-                shape = shape.copy(
-                    xIndent = xIndent,
-                    cornerRadius = cornerRadius,
-                    yIndent = shapeIndentHeight,
+        return produceState(
+            initialValue = IndentRectShape(
+                indentShapeData = IndentShapeData(
+                    ballOffset = ballSize.toPxf(density) / 2f,
+                    width = indentWidth.toPxf(density),
                 )
-                shape
-            }
+            ),
+            key1 = fraction.value,
+            key2 = shapeCornerRadius
+        ) {
+            this.value = this.value.copy(
+                yIndent = calculateYIndent(fraction.value,density),
+                xIndent = if (fraction.value <= 1f) from.x else to.x,
+                cornerRadius = shapeCornerRadius
+            )
+        }
+    }
+
+    private fun calculateYIndent(fraction: Float, density: Density): Float {
+        return if (fraction <= 1f) {
+            lerp(indentHeight.toPxf(density), 0f, fraction)
+        } else {
+            lerp(0f, indentHeight.toPxf(density), fraction - 1f)
         }
     }
 

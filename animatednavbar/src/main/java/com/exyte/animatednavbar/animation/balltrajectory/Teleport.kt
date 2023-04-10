@@ -71,11 +71,9 @@ class Teleport(
                 isAnimationNotRunning(fraction.value) -> {
                     setNewAnimationPoints()
                 }
-
                 isExitBallAnimation(fraction.value) -> {
                     changeToAnimationPointWhileAnimating()
                 }
-
                 isEnterBallAnimation(fraction.value) -> {
                     changeToAndFromPointsWhileAnimating()
                 }
@@ -83,25 +81,14 @@ class Teleport(
             fraction.animateTo(2f, animationSpec)
         }
 
-        var ballAnimInfo by remember {
-            mutableStateOf(BallAnimInfo(scale = 1f, offset = offset.value))
-        }
-
-        return remember {
-            derivedStateOf {
-                ballAnimInfo = if (fraction.value < 1f) {
-                    ballAnimInfo.copy(
-                        scale = 1f - fraction.value,
-                        offset = from
-                    )
-                } else {
-                    ballAnimInfo.copy(
-                        scale = fraction.value - 1f,
-                        offset = to
-                    )
-                }
-                ballAnimInfo
-            }
+        return produceState(
+            initialValue = BallAnimInfo(),
+            key1 = fraction.value
+        ) {
+            this.value = this.value.copy(
+                scale = if (fraction.value < 1f) 1f - fraction.value else fraction.value - 1f,
+                offset = if (fraction.value < 1f) from else to
+            )
         }
     }
 
