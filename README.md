@@ -48,7 +48,7 @@ AnimatedNavigationBar(selectedIndex = selectedIndex) {
 You can build your own animation, just implement the `BallAnimation` interface.
 
 `indentAnimation` - Indent animation with the animation curve, default value is `Height(tween(300))`    
-- `Height`  -  Disappear by height and quickly re-appear also by height above selected tab 
+- `Height`  -  Disappear by decreasing in height and quickly re-appear by increasing in height above the selected tab 
 - `StraightIndent` - Slide to the selected tab   
 You can also build your own animation, just implement the `IndentAnimation` interface.
 
