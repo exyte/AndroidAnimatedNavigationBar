@@ -1,5 +1,6 @@
 package com.exyte.animatednavbar
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -21,6 +22,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.exyte.animatednavbar.animation.balltrajectory.BallAnimInfo
 import com.exyte.animatednavbar.animation.balltrajectory.BallAnimation
+import com.exyte.animatednavbar.animation.balltrajectory.Parabolic
+import com.exyte.animatednavbar.animation.indendshape.Height
 import com.exyte.animatednavbar.animation.indendshape.IndentAnimation
 import com.exyte.animatednavbar.animation.indendshape.ShapeCornerRadius
 import com.exyte.animatednavbar.animation.indendshape.shapeCornerRadius
@@ -46,10 +49,10 @@ fun AnimatedNavigationBar(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
     barColor: Color = Color.White,
-    ballColor: Color = Color.Red,
+    ballColor: Color = Color.Black,
     cornerRadius: ShapeCornerRadius = shapeCornerRadius(0f),
-    ballAnimation: BallAnimation,
-    indentAnimation: IndentAnimation,
+    ballAnimation: BallAnimation = Parabolic(tween(300)),
+    indentAnimation: IndentAnimation = Height(tween(300)),
     content: @Composable () -> Unit,
 ) {
 
