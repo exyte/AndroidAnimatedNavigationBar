@@ -3,7 +3,7 @@
 
 
 <p><h1 align="left">Animated Navigation Bar</h1></p>
-<p><h4>AnimatedNavigationBar is a navigation bar with number of preset animations written in Jetpack Compose</h4></p>
+<p><h4>AnimatedNavigationBar is a navigation bar with a number of preset animations written in Jetpack Compose</h4></p>
 
 ___
 
@@ -17,7 +17,7 @@ ___
 [![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
 
 # Usage
-1. Rember Int to store current location
+1. Remember Int to store the current selection
 ```kotlin
 var selectedIndex by remember { mutableStateOf(0) }
 ```
@@ -41,17 +41,16 @@ AnimatedNavigationBar(selectedIndex = selectedIndex) {
 `barColor` - Color of the navigation bar itself   
 `ballColor` - Ball indicator color   
 `cornerRadius` - The corner radius to all corners applied to the navigation bar         
-
-`ballAnimation` - ball animation class with animation curve, default value: `Parabolic(tween(300))`
+`ballAnimation` - Ball animation with the animation curve, default value `Parabolic(tween(300))`
 - `Parabolic`  - Jump to the selected button following a parabolic arc    
 - `Teleport` - Disappear and quickly re-appear above selected tab
 - `Straight` - Slide to the selected tab   
-You can build your own animation, just implement `BallAnimation` interfase.
+You can build your own animation, just implement the `BallAnimation` interface.
 
-`indentAnimation` - indent animation class with animation curve, default value: `Height(tween(300))`    
+`indentAnimation` - Indent animation with the animation curve, default value is `Height(tween(300))`    
 - `Height`  -  Disappear by height and quickly re-appear also by height above selected tab 
 - `StraightIndent` - Slide to the selected tab   
-You can also build your own animation, just implement `IndentAnimation` interfase.
+You can also build your own animation, just implement the `IndentAnimation` interface.
 
 ### Built-in animatable tab buttons
 This library has two built-in button types you can use out-of-the-box:
