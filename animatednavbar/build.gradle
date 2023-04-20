@@ -3,6 +3,24 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+ext {
+    PUBLISH_GROUP_ID = 'com.exyte'
+    PUBLISH_VERSION = '1.0.0'
+    PUBLISH_ARTIFACT_ID = 'animated-navigation-bar'
+    PUBLISH_DESCRIPTION = 'navigation bar with a number of preset animations'
+    PUBLISH_URL = 'https://github.com/exyte/AndroidAnimatedNavigationBar'
+    PUBLISH_LICENSE_NAME = 'MIT License'
+    PUBLISH_LICENSE_URL = 'https://github.com/exyte/AndroidAnimatedNavigationBar/blob/master/LICENSE'
+    PUBLISH_DEVELOPER_ID = 'exyte'
+    PUBLISH_DEVELOPER_NAME = 'Alex Yudenkov'
+    PUBLISH_DEVELOPER_EMAIL = 'alexydenkov@gmail.com'
+    PUBLISH_SCM_CONNECTION = 'scm:git:github.com/exyte/AndroidAnimatedNavigationBar.git'
+    PUBLISH_SCM_DEVELOPER_CONNECTION = 'scm:git:ssh://github.com/exyte/AndroidAnimatedNavigationBar.git'
+    PUBLISH_SCM_URL = 'https://github.com/exyte/AndroidAnimatedNavigationBar/tree/master'
+}
+
+apply from: "publish-module.gradle"
+
 android {
     compileSdk 33
 
@@ -44,8 +62,8 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.0'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
-    implementation 'androidx.compose.material:material:1.3.1'
+    implementation 'androidx.compose.material:material:1.4.1'
 }
