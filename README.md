@@ -14,9 +14,11 @@ ___
 
 <a href="https://exyte.com/contacts"><img src="https://i.imgur.com/vGjsQPt.png" width="134" height="34"></a> <a href="https://twitter.com/exyteHQ"><img src="https://i.imgur.com/DngwSn1.png" width="165" height="34"></a>
 </br></br>
-[![Twitter](https://img.shields.io/badge/Twitter-@exyteHQ-blue.svg?style=flat)](http://twitter.com/exyteHQ)
+[![Licence](https://img.shields.io/github/license/exyte/AndroidAnimatedNavigationBar)](https://github.com/exyte/AndroidAnimatedNavigationBar/blob/master/LICENSE)
+[![API](https://img.shields.io/badge/API%20-21%2B-brightgreen)](https://github.com/exyte/AndroidAnimatedNavigationBar)
+[![Maven-Central](https://img.shields.io/maven-central/v/com.exyte/animated-navigation-bar)](https://central.sonatype.com/artifact/com.exyte/animated-navigation-bar/1.0.0/overview)
 
-# Usage
+## Usage
 1. Remember Int to store the current selection
 ```kotlin
 var selectedIndex by remember { mutableStateOf(0) }
@@ -55,6 +57,15 @@ You can also build your own animation, just implement the `IndentAnimation` inte
 ### Built-in animatable tab buttons
 This library has two built-in button types you can use out-of-the-box:
 `DropletButton` and `WiggleButton`, and a super custom `ColorButton` type in the Example project. Please feel free to use them in your projects or build your own buttons.
+
+## Download
+
+Add the dependency in `build.gradle` file:
+```gradle
+dependencies {
+    implementation("com.exyte:animated-navigation-bar:1.0.0")
+}
+```
 
 ## Acknowledgements
 
