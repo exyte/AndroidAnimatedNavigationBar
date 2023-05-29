@@ -4,6 +4,7 @@
 
 <p><h1 align="left">Animated Navigation Bar</h1></p>
 <p><h4>AnimatedNavigationBar is a navigation bar with a number of preset animations written in Jetpack Compose</h4></p>
+ <a href="https://exyte.com/blog/animated-navigation-bar">Read Article »</a>
 
 ___
 
