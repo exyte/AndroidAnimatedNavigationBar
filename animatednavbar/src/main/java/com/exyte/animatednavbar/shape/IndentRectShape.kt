@@ -72,6 +72,16 @@ fun Path.addRoundRectWithIndent(
             )
         }
 
+        addPath(
+            ArcPath(
+                size = Size(
+                    width,
+                    height,
+                ),
+                fabRadius = indentShapeData.fabRadius
+            ).createPath()
+        )
+
         lineTo(width - cornerRadius.topRight, 0f)
         arcTo(
             rect = Rect(

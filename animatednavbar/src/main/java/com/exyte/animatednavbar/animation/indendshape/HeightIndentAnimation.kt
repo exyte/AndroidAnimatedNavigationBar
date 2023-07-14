@@ -29,6 +29,7 @@ class Height(
     private val animationSpec: FiniteAnimationSpec<Float>,
     private val indentWidth: Dp = 50.dp,
     private val indentHeight: Dp = 10.dp,
+    private val fabRadius: Dp = 0.dp
 ) : IndentAnimation {
 
     @Composable
@@ -84,6 +85,7 @@ class Height(
                 indentShapeData = IndentShapeData(
                     ballOffset = ballSize.toPxf(density) / 2f,
                     width = indentWidth.toPxf(density),
+                    fabRadius = fabRadius.toPxf()
                 )
             ),
             key1 = fraction.value,

@@ -24,6 +24,7 @@ class StraightIndent(
     private val animationSpec: FiniteAnimationSpec<Float>,
     private val indentWidth: Dp = 50.dp,
     private val indentHeight: Dp = 20.dp,
+    private val fabButtonRadius: Dp = 0.dp
 ) : IndentAnimation {
 
     @Composable
@@ -49,7 +50,8 @@ class StraightIndent(
                     height = indentHeight.toPxf(density),
                     ballOffset = ballSize.toPxf(density) / 2f,
                     width = indentWidth.toPxf(density),
-                    cornerRadius = shapeCornerRadius
+                    cornerRadius = shapeCornerRadius,
+                    fabRadius = fabButtonRadius.toPxf()
                 )
             ),
             key1 = position.value,

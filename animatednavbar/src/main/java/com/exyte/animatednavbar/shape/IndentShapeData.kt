@@ -9,4 +9,5 @@ data class IndentShapeData(
     val width: Float = 0f,
     val cornerRadius: ShapeCornerRadius = shapeCornerRadius(0f),
     val ballOffset: Float = 0f,
+    val fabRadius: Float = 0f,
 )
