@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
@@ -48,6 +49,7 @@ import com.exyte.animatednavbar.utils.ballTransform
 fun AnimatedNavigationBar(
     modifier: Modifier = Modifier,
     selectedIndex: Int,
+    barBrush: Brush? = null,
     barColor: Color = Color.White,
     ballColor: Color = Color.Black,
     cornerRadius: ShapeCornerRadius = shapeCornerRadius(0f),
@@ -87,7 +89,7 @@ fun AnimatedNavigationBar(
                     clip = true
                     shape = indentShape.value
                 }
-                .background(barColor),
+                .then(if (barBrush != null) Modifier.background(brush = barBrush) else Modifier.background(color = barColor)),
             content = content,
             measurePolicy = measurePolicy
         )
