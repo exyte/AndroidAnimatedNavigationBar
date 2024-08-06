@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'com.exyte.navbar'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.exyte.navbar"
@@ -57,4 +57,5 @@ dependencies {
     implementation 'androidx.compose.material:material:1.4.1'
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
     implementation(project(":animatednavbar"))
+    implementation 'androidx.navigation:navigation-compose:2.7.7'
 }
